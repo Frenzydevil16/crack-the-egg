@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="upG" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e9b8ff"/>
+      <stop offset="100%" stop-color="#8b3ff0"/>
+    </linearGradient>
+    <linearGradient id="boltG" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff59a"/>
+      <stop offset="100%" stop-color="#ffb800"/>
+    </linearGradient>
+  </defs>
+  <path d="M 32,5 L 56,30 L 42,30 L 42,58 L 22,58 L 22,30 L 8,30 Z" fill="url(#upG)" stroke="#2a1150" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 35,26 L 25,42 L 32,42 L 29,54 L 40,37 L 33,37 Z" fill="url(#boltG)" stroke="#2a1150" stroke-width="2.5" stroke-linejoin="round"/>
+  <ellipse cx="26" cy="20" rx="5" ry="2.5" transform="rotate(-45 26 20)" fill="#ffffff" opacity="0.8"/>
+</svg>

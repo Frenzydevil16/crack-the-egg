@@ -1,0 +1,1271 @@
+[gd_scene load_steps=34 format=3 uid="uid://c6a8r0k1eeggs"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Texture2D" path="res://assets/background.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/egg.svg" id="3_egg"]
+[ext_resource type="Texture2D" path="res://assets/egg_shadow.svg" id="4_shadow"]
+[ext_resource type="Texture2D" path="res://assets/mouse_icon.svg" id="6_mouse"]
+[ext_resource type="Script" path="res://scripts/crack_overlay.gd" id="7_cracks"]
+[ext_resource type="AudioStream" path="res://assets/audio/tap.wav" id="8_tap"]
+[ext_resource type="AudioStream" path="res://assets/audio/crack.wav" id="9_crack"]
+[ext_resource type="AudioStream" path="res://assets/audio/shatter.wav" id="10_shatter"]
+[ext_resource type="Texture2D" path="res://assets/egg_overlay.svg" id="11_egg_over"]
+[ext_resource type="Texture2D" path="res://assets/coin_icon.svg" id="12_coin"]
+[ext_resource type="Texture2D" path="res://assets/shop_icon.svg" id="13_shop"]
+[ext_resource type="Texture2D" path="res://assets/collection_icon.svg" id="14_coll"]
+[ext_resource type="Script" path="res://scripts/drop_reveal_effect.gd" id="15_reveal_fx"]
+[ext_resource type="AudioStream" path="res://assets/audio/buy.wav" id="16_buy"]
+[ext_resource type="Script" path="res://scripts/world_backdrop.gd" id="17_backdrop"]
+[ext_resource type="Script" path="res://scripts/side_click_fx.gd" id="18_side_fx"]
+[ext_resource type="Script" path="res://scripts/fancy_progress_bar.gd" id="19_fancy_bar"]
+[ext_resource type="Texture2D" path="res://assets/menu_icon.svg" id="20_menu"]
+[ext_resource type="Texture2D" path="res://assets/upgrades_icon.svg" id="21_upgrades"]
+[ext_resource type="Texture2D" path="res://assets/settings_icon.svg" id="22_settings"]
+[ext_resource type="Texture2D" path="res://assets/play_icon.svg" id="23_play"]
+[ext_resource type="Texture2D" path="res://assets/slimes/slime_mythic_alpha.png" id="24_mythic"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill"]
+bg_color = Color(0.06, 0.11, 0.24, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.24, 0.44, 0.78, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop_btn"]
+bg_color = Color(0.96, 0.58, 0.09, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 5
+border_color = Color(0.32, 0.16, 0.02, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_coll_btn"]
+bg_color = Color(0.14, 0.38, 0.74, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 5
+border_color = Color(0.05, 0.15, 0.35, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_new_badge"]
+bg_color = Color(0.96, 0.18, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.35, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_empty"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_milestone"]
+bg_color = Color(0.08, 0.13, 0.28, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.82, 0.12, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
+bg_color = Color(0.08, 0.12, 0.24, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(1, 0.82, 0.14, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+content_margin_left = 26.0
+content_margin_top = 22.0
+content_margin_right = 26.0
+content_margin_bottom = 22.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_subbox"]
+bg_color = Color(0.12, 0.18, 0.34, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.32, 0.52, 0.88, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_btn"]
+bg_color = Color(0.18, 0.78, 0.34, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 7
+border_color = Color(0.05, 0.32, 0.12, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+content_margin_left = 24.0
+content_margin_top = 12.0
+content_margin_right = 24.0
+content_margin_bottom = 14.0
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="WorldBackdrop" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("17_backdrop")
+
+[node name="AtmosphereOverlay" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.45, 0.15, 0.2)
+
+[node name="SafeContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = 72.0
+offset_right = -32.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HeaderContainer" type="VBoxContainer" parent="SafeContainer"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 64.0
+offset_bottom = 186.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="TitleLine1" type="Label" parent="SafeContainer/HeaderContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.18, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 40
+text = "Klicke auf das Ei"
+horizontal_alignment = 1
+
+[node name="TitleLine2" type="RichTextLabel" parent="SafeContainer/HeaderContainer"]
+clip_contents = false
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.18, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+bbcode_enabled = true
+text = "[center][color=#ffd93d][b]10.000[/b][/color] mal, um es zu öffnen![/center]"
+scroll_active = false
+
+[node name="TopLeftBar" type="HBoxContainer" parent="SafeContainer"]
+layout_mode = 1
+anchors_preset = 0
+offset_right = 520.0
+offset_bottom = 56.0
+theme_override_constants/separation = 10
+
+[node name="MenuButton" type="Button" parent="SafeContainer/TopLeftBar"]
+custom_minimum_size = Vector2(126, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.18, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_coll_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_coll_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_coll_btn")
+text = "Menü"
+icon = ExtResource("20_menu")
+expand_icon = true
+
+[node name="CollectionButton" type="Button" parent="SafeContainer/TopLeftBar"]
+custom_minimum_size = Vector2(162, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.18, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_coll_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_coll_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_coll_btn")
+text = "Sammlung"
+icon = ExtResource("14_coll")
+expand_icon = true
+
+[node name="NewBadge" type="PanelContainer" parent="SafeContainer/TopLeftBar/CollectionButton"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -44.0
+offset_top = -9.0
+offset_right = 6.0
+offset_bottom = 17.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_new_badge")
+
+[node name="NewLbl" type="Label" parent="SafeContainer/TopLeftBar/CollectionButton/NewBadge"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "NEU!"
+horizontal_alignment = 1
+
+[node name="PowerPill" type="PanelContainer" parent="SafeContainer/TopLeftBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill")
+
+[node name="PowerLabel" type="Label" parent="SafeContainer/TopLeftBar/PowerPill"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.97, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "⚡ 1x Klick | 🍀 Standard"
+
+[node name="BoosterStatusBar" type="HBoxContainer" parent="SafeContainer/TopLeftBar"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TopRightBar" type="HBoxContainer" parent="SafeContainer"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -520.0
+offset_bottom = 56.0
+grow_horizontal = 0
+theme_override_constants/separation = 10
+alignment = 2
+
+[node name="CounterPill" type="PanelContainer" parent="SafeContainer/TopRightBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill")
+
+[node name="HBox" type="HBoxContainer" parent="SafeContainer/TopRightBar/CounterPill"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="MouseIcon" type="TextureRect" parent="SafeContainer/TopRightBar/CounterPill/HBox"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("6_mouse")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CounterLabel" type="Label" parent="SafeContainer/TopRightBar/CounterPill/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.16, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "0"
+
+[node name="CoinPill" type="PanelContainer" parent="SafeContainer/TopRightBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill")
+
+[node name="HBox" type="HBoxContainer" parent="SafeContainer/TopRightBar/CoinPill"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="CoinIcon" type="TextureRect" parent="SafeContainer/TopRightBar/CoinPill/HBox"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("12_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinLabel" type="Label" parent="SafeContainer/TopRightBar/CoinPill/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.07, 0.02, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "300"
+
+[node name="ShopButton" type="Button" parent="SafeContainer/TopRightBar"]
+custom_minimum_size = Vector2(142, 54)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_shop_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_shop_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_shop_btn")
+
+[node name="Content" type="HBoxContainer" parent="SafeContainer/TopRightBar/ShopButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="ShopIcon" type="TextureRect" parent="SafeContainer/TopRightBar/ShopButton/Content"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("13_shop")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ShopCoinLabel" type="Label" parent="SafeContainer/TopRightBar/ShopButton/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.22, 0.1, 0.02, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "SHOP"
+
+[node name="SettingsButton" type="Button" parent="SafeContainer/TopRightBar"]
+custom_minimum_size = Vector2(56, 54)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_coll_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_coll_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_coll_btn")
+icon = ExtResource("22_settings")
+icon_alignment = 1
+expand_icon = true
+
+[node name="EggCenterAnchor" type="Control" parent="SafeContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="EggShadow" type="TextureRect" parent="SafeContainer/EggCenterAnchor"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = 185.0
+offset_right = 210.0
+offset_bottom = 285.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_shadow")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SideClickFX" type="Control" parent="SafeContainer/EggCenterAnchor"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -300.0
+offset_right = 380.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("18_side_fx")
+
+[node name="ShardContainer" type="Node2D" parent="SafeContainer/EggCenterAnchor"]
+
+[node name="EggContainer" type="Control" parent="SafeContainer/EggCenterAnchor"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -260.0
+offset_right = 210.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(210, 260)
+mouse_filter = 2
+
+[node name="EggVisual" type="Control" parent="SafeContainer/EggCenterAnchor/EggContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(210, 260)
+mouse_filter = 2
+
+[node name="EggSprite" type="TextureRect" parent="SafeContainer/EggCenterAnchor/EggContainer/EggVisual"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_egg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CrackOverlay" type="Control" parent="SafeContainer/EggCenterAnchor/EggContainer/EggVisual"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_cracks")
+
+[node name="EggHighlight" type="TextureRect" parent="SafeContainer/EggCenterAnchor/EggContainer/EggVisual"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("11_egg_over")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TouchArea" type="Control" parent="SafeContainer/EggCenterAnchor/EggContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+
+[node name="FXContainer" type="Control" parent="SafeContainer/EggCenterAnchor/EggContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MilestoneBanner" type="PanelContainer" parent="SafeContainer"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -260.0
+offset_top = 165.0
+offset_right = 260.0
+offset_bottom = 220.0
+grow_horizontal = 2
+pivot_offset = Vector2(260, 27)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_milestone")
+
+[node name="MilestoneLabel" type="Label" parent="SafeContainer/MilestoneBanner"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.15, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.06, 0.02, 1)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 20
+text = "50% GESCHAFFT!"
+horizontal_alignment = 1
+
+[node name="BottomAnchor" type="Control" parent="SafeContainer"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="ProgressPill" type="PanelContainer" parent="SafeContainer/BottomAnchor"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -310.0
+offset_top = -84.0
+offset_right = 310.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_progress_empty")
+
+[node name="FancyBar" type="Control" parent="SafeContainer/BottomAnchor/ProgressPill"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("19_fancy_bar")
+
+[node name="FillClip" type="Control" parent="SafeContainer/BottomAnchor/ProgressPill"]
+visible = false
+clip_contents = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="FillBar" type="ColorRect" parent="SafeContainer/BottomAnchor/ProgressPill/FillClip"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.188235, 0.556863, 0.901961, 1)
+
+[node name="ProgressLabel" type="Label" parent="SafeContainer/BottomAnchor/ProgressPill"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.06, 0.16, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 26
+text = "0 / 10.000  (0 %)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DropDimScrim" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.03, 0.07, 0.85)
+
+[node name="FlashOverlay" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+
+[node name="DropRevealOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RevealEffect" type="Control" parent="DropRevealOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("15_reveal_fx")
+
+[node name="CenterContainer" type="CenterContainer" parent="DropRevealOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DropCard" type="PanelContainer" parent="DropRevealOverlay/CenterContainer"]
+custom_minimum_size = Vector2(490, 560)
+layout_mode = 2
+pivot_offset = Vector2(245, 280)
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="VBox" type="VBoxContainer" parent="DropRevealOverlay/CenterContainer/DropCard"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="HeaderLabel" type="Label" parent="DropRevealOverlay/CenterContainer/DropCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.14, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.08, 0.02, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+text = "GESCHAFFT! DU HAST DAS EI GEKNACKT!"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RarityBanner" type="PanelContainer" parent="DropRevealOverlay/CenterContainer/DropCard/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
+
+[node name="RarityLabel" type="Label" parent="DropRevealOverlay/CenterContainer/DropCard/VBox/RarityBanner"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.05, 0.06, 0.12, 1)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 22
+text = "★ RARE (7%) ★"
+horizontal_alignment = 1
+
+[node name="SlimeHolder" type="Control" parent="DropRevealOverlay/CenterContainer/DropCard/VBox"]
+custom_minimum_size = Vector2(260, 220)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="SlimeIcon" type="TextureRect" parent="DropRevealOverlay/CenterContainer/DropCard/VBox/SlimeHolder"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -95.0
+offset_top = -95.0
+offset_right = 95.0
+offset_bottom = 95.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(95, 95)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NewUnlockTag" type="PanelContainer" parent="DropRevealOverlay/CenterContainer/DropCard/VBox/SlimeHolder"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -110.0
+offset_top = -6.0
+offset_right = 10.0
+offset_bottom = 24.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_new_badge")
+
+[node name="TagLabel" type="Label" parent="DropRevealOverlay/CenterContainer/DropCard/VBox/SlimeHolder/NewUnlockTag"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "NEU ENTDECKT!"
+horizontal_alignment = 1
+
+[node name="SlimeNameLabel" type="Label" parent="DropRevealOverlay/CenterContainer/DropCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.05, 0.06, 0.12, 1)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 26
+text = "Frost-Kristall Slime"
+horizontal_alignment = 1
+
+[node name="SlimeDescLabel" type="Label" parent="DropRevealOverlay/CenterContainer/DropCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.91, 0.98, 1)
+theme_override_font_sizes/font_size = 16
+text = "Ein funkelnder Eis-Slime!"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RewardBox" type="PanelContainer" parent="DropRevealOverlay/CenterContainer/DropCard/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
+
+[node name="RewardLabel" type="Label" parent="DropRevealOverlay/CenterContainer/DropCard/VBox/RewardBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.28, 1)
+theme_override_font_sizes/font_size = 20
+text = "+1.500 Münzen Belohnung!"
+horizontal_alignment = 1
+
+[node name="ConfirmDropButton" type="Button" parent="DropRevealOverlay/CenterContainer/DropCard/VBox"]
+custom_minimum_size = Vector2(310, 58)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_start_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_start_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_start_btn")
+theme_override_font_sizes/font_size = 20
+text = "Belohnung einsammeln & Neues Ei"
+
+[node name="ShopOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Scrim" type="ColorRect" parent="ShopOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.05, 0.12, 0.86)
+
+[node name="CenterContainer" type="CenterContainer" parent="ShopOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShopPanel" type="PanelContainer" parent="ShopOverlay/CenterContainer"]
+custom_minimum_size = Vector2(580, 610)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="MainVBox" type="VBoxContainer" parent="ShopOverlay/CenterContainer/ShopPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TopBar" type="HBoxContainer" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="ShopTitle" type="Label" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.86, 0.22, 1)
+theme_override_font_sizes/font_size = 25
+text = "🛒 SHOP & UPGRADES"
+
+[node name="CoinBox" type="HBoxContainer" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CoinIcon" type="TextureRect" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/TopBar/CoinBox"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("12_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ShopBalanceLabel" type="Label" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/TopBar/CoinBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.3, 1)
+theme_override_font_sizes/font_size = 21
+text = "300 Münzen"
+
+[node name="CloseShopButton" type="Button" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/TopBar"]
+custom_minimum_size = Vector2(128, 48)
+layout_mode = 2
+text = "✕ Schließen"
+
+[node name="TabBar" type="HBoxContainer" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FeedbackLabel" type="Label" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.91, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Wähle ein Upgrade oder Hilfsmittel aus!"
+horizontal_alignment = 1
+
+[node name="OddsPreviewBox" type="PanelContainer" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
+
+[node name="OddsRichText" type="RichTextLabel" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/OddsPreviewBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 14
+theme_override_font_sizes/bold_font_size = 14
+bbcode_enabled = true
+text = "Drop-Wahrscheinlichkeiten"
+scroll_active = false
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemsVBox" type="VBoxContainer" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="CollectionOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Scrim" type="ColorRect" parent="CollectionOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.05, 0.12, 0.86)
+
+[node name="CenterContainer" type="CenterContainer" parent="CollectionOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CollectionPanel" type="PanelContainer" parent="CollectionOverlay/CenterContainer"]
+custom_minimum_size = Vector2(580, 610)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="MainVBox" type="VBoxContainer" parent="CollectionOverlay/CenterContainer/CollectionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TopBar" type="HBoxContainer" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.45, 0.88, 1, 1)
+theme_override_font_sizes/font_size = 25
+text = "📘 SLIME-SAMMLUNG"
+
+[node name="SummaryLabel" type="Label" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.93, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "Freigeschaltet: 0 / 6"
+
+[node name="CloseCollectionButton" type="Button" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox/TopBar"]
+custom_minimum_size = Vector2(128, 48)
+layout_mode = 2
+text = "✕ Schließen"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SlimeGrid" type="GridContainer" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="SettingsOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Scrim" type="ColorRect" parent="SettingsOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.05, 0.12, 0.86)
+
+[node name="CenterContainer" type="CenterContainer" parent="SettingsOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SettingsPanel" type="PanelContainer" parent="SettingsOverlay/CenterContainer"]
+custom_minimum_size = Vector2(520, 500)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="MainVBox" type="VBoxContainer" parent="SettingsOverlay/CenterContainer/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TopBar" type="HBoxContainer" parent="SettingsOverlay/CenterContainer/SettingsPanel/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="SettingsOverlay/CenterContainer/SettingsPanel/MainVBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.96, 1, 1)
+theme_override_font_sizes/font_size = 25
+text = "⚙ EINSTELLUNGEN"
+
+[node name="CloseSettingsButton" type="Button" parent="SettingsOverlay/CenterContainer/SettingsPanel/MainVBox/TopBar"]
+custom_minimum_size = Vector2(128, 48)
+layout_mode = 2
+text = "✕ Schließen"
+
+[node name="OptionsVBox" type="VBoxContainer" parent="SettingsOverlay/CenterContainer/SettingsPanel/MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="MainMenuOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BackdropTint" type="ColorRect" parent="MainMenuOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.08, 0.2, 0.72)
+
+[node name="MenuAura" type="Control" parent="MainMenuOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("15_reveal_fx")
+
+[node name="CenterContainer" type="CenterContainer" parent="MainMenuOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuCard" type="PanelContainer" parent="MainMenuOverlay/CenterContainer"]
+custom_minimum_size = Vector2(560, 650)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="VBox" type="VBoxContainer" parent="MainMenuOverlay/CenterContainer/MenuCard"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="TopStatsBar" type="HBoxContainer" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="MenuCoinPill" type="PanelContainer" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/TopStatsBar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
+
+[node name="MenuCoinLabel" type="Label" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/TopStatsBar/MenuCoinPill"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "🪙 300 Münzen"
+
+[node name="MenuSlimePill" type="PanelContainer" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/TopStatsBar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
+
+[node name="MenuSlimeLabel" type="Label" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/TopStatsBar/MenuSlimePill"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "📘 Slimes: 0 / 6"
+
+[node name="MenuTitle" type="Label" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.22, 1)
+theme_override_colors/font_outline_color = Color(0.06, 0.08, 0.2, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 44
+text = "CRACK THE EGG"
+horizontal_alignment = 1
+
+[node name="MenuSubtitle" type="Label" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.95, 1, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.18, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "✨ 10.000 Klicks • Magische Slime-Welt ✨"
+horizontal_alignment = 1
+
+[node name="HeroStage" type="Control" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]
+custom_minimum_size = Vector2(460, 220)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HeroEgg" type="TextureRect" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/HeroStage"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -85.0
+offset_right = -10.0
+offset_bottom = 85.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(80, 85)
+texture = ExtResource("3_egg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeroEggGloss" type="TextureRect" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/HeroStage/HeroEgg"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("11_egg_over")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeroSlime" type="TextureRect" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/HeroStage"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = -80.0
+offset_right = 170.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(80, 80)
+texture = ExtResource("24_mythic")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ProgressStatusBox" type="PanelContainer" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
+
+[node name="MenuProgressLabel" type="Label" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/ProgressStatusBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Aktueller Ei-Fortschritt: 0 / 10.000 (0 %)"
+horizontal_alignment = 1
+
+[node name="StartGameButton" type="Button" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]
+custom_minimum_size = Vector2(380, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_start_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_start_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_start_btn")
+theme_override_font_sizes/font_size = 26
+text = "SPIEL STARTEN"
+icon = ExtResource("23_play")
+expand_icon = true
+
+[node name="NavGrid" type="GridContainer" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="MenuShopBtn" type="Button" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/NavGrid"]
+custom_minimum_size = Vector2(235, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Shop"
+icon = ExtResource("13_shop")
+expand_icon = true
+
+[node name="MenuCollectionBtn" type="Button" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/NavGrid"]
+custom_minimum_size = Vector2(235, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Slime-Sammlung"
+icon = ExtResource("14_coll")
+expand_icon = true
+
+[node name="MenuUpgradesBtn" type="Button" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/NavGrid"]
+custom_minimum_size = Vector2(235, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Upgrades"
+icon = ExtResource("21_upgrades")
+expand_icon = true
+
+[node name="MenuSettingsBtn" type="Button" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/NavGrid"]
+custom_minimum_size = Vector2(235, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Einstellungen"
+icon = ExtResource("22_settings")
+expand_icon = true
+
+[node name="PauseOverlay" type="ColorRect" parent="."]
+process_mode = 2
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.08, 0.88)
+
+[node name="PauseCard" type="VBoxContainer" parent="PauseOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="PauseTitle" type="Label" parent="PauseOverlay/PauseCard"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "PAUSIERT"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="PauseOverlay/PauseCard"]
+custom_minimum_size = Vector2(180, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Weiterspielen"
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="TapPlayer" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("8_tap")
+
+[node name="CrackPlayer" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("9_crack")
+
+[node name="ShatterPlayer" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("10_shatter")
+
+[node name="BuyPlayer" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("16_buy")

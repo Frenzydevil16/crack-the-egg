@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 640" width="512" height="640">
+  <defs>
+    <radialGradient id="cosmicBaseGrad" cx="38%" cy="30%" r="72%" fx="30%" fy="24%">
+      <stop offset="0%" stop-color="#6b2cf5"/>
+      <stop offset="28%" stop-color="#3c158a"/>
+      <stop offset="62%" stop-color="#1e094d"/>
+      <stop offset="88%" stop-color="#0e0429"/>
+      <stop offset="100%" stop-color="#050112"/>
+    </radialGradient>
+    <radialGradient id="nebulaPink" cx="65%" cy="42%" r="48%">
+      <stop offset="0%" stop-color="#ff38d4" stop-opacity="0.65"/>
+      <stop offset="55%" stop-color="#9b1dff" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#1e094d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="nebulaCyan" cx="32%" cy="68%" r="45%">
+      <stop offset="0%" stop-color="#24f0ff" stop-opacity="0.62"/>
+      <stop offset="55%" stop-color="#2b68ff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#0e0429" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="veinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#42f5ff"/>
+      <stop offset="50%" stop-color="#e44dff"/>
+      <stop offset="100%" stop-color="#ffaa2b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main Deep Cosmic Egg Body -->
+  <path d="M 256,24 C 368,24 470,178 470,382 C 470,550 378,618 256,618 C 134,618 42,550 42,382 C 42,178 144,24 256,24 Z" fill="url(#cosmicBaseGrad)"/>
+
+  <!-- Nebula Clouds Inside Shell -->
+  <path d="M 256,24 C 368,24 470,178 470,382 C 470,550 378,618 256,618 C 134,618 42,550 42,382 C 42,178 144,24 256,24 Z" fill="url(#nebulaPink)"/>
+  <path d="M 256,24 C 368,24 470,178 470,382 C 470,550 378,618 256,618 C 134,618 42,550 42,382 C 42,178 144,24 256,24 Z" fill="url(#nebulaCyan)"/>
+
+  <!-- Mysterious Cosmic Energy Veins & Swirls -->
+  <g fill="none" stroke="url(#veinGrad)" stroke-linecap="round" opacity="0.82">
+    <path d="M 135,175 Q 225,215 268,310 T 395,435" stroke-width="6.5"/>
+    <path d="M 358,145 Q 290,240 215,335 T 118,485" stroke-width="5.5"/>
+    <path d="M 92,330 Q 195,380 285,355 T 425,290" stroke-width="4.5"/>
+  </g>
+
+  <!-- Swirling Galaxy Spiral Core -->
+  <ellipse cx="268" cy="315" rx="68" ry="32" transform="rotate(-24 268 315)" fill="none" stroke="#5cf5ff" stroke-width="4" opacity="0.55"/>
+  <ellipse cx="268" cy="315" rx="38" ry="18" transform="rotate(-24 268 315)" fill="#ff75f8" opacity="0.45"/>
+  <circle cx="268" cy="315" r="12" fill="#ffffff" opacity="0.92"/>
+
+  <!-- Glowing Stars & Constellations -->
+  <g fill="#ffffff">
+    <polygon points="180,140 185,155 200,160 185,165 180,180 175,165 160,160 175,155" fill="#ffe86b"/>
+    <polygon points="355,215 360,228 373,233 360,238 355,251 350,238 337,233 350,228" fill="#5ceeff"/>
+    <polygon points="155,425 160,440 175,445 160,450 155,465 150,450 135,445 150,440" fill="#ff78f0"/>
+    <polygon points="345,475 350,488 363,493 350,498 345,511 340,498 327,493 340,488" fill="#ffe86b"/>
+    <circle cx="245" cy="115" r="4.5"/>
+    <circle cx="315" cy="150" r="3.5"/>
+    <circle cx="125" cy="265" r="4.0"/>
+    <circle cx="395" cy="345" r="4.5"/>
+    <circle cx="215" cy="515" r="3.8"/>
+    <circle cx="295" cy="545" r="3.2"/>
+    <circle cx="265" cy="435" r="5.0" fill="#70f8ff"/>
+  </g>
+</svg>

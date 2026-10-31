@@ -1,0 +1,13 @@
+# Godot 4+ cache & imports
+.godot/
+*.translation
+
+# Mono / C#
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.tmp

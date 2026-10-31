@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 640" width="512" height="640">
+  <defs>
+    <radialGradient id="natureBaseGrad" cx="36%" cy="28%" r="68%" fx="28%" fy="22%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="22%" stop-color="#fff8ee"/>
+      <stop offset="55%" stop-color="#f9ead4"/>
+      <stop offset="82%" stop-color="#e4cca8"/>
+      <stop offset="100%" stop-color="#bda078"/>
+    </radialGradient>
+    <linearGradient id="natureAmbient" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="62%" stop-color="#48c764" stop-opacity="0.06"/>
+      <stop offset="88%" stop-color="#287a3e" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#144522" stop-opacity="0.45"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7dff8b"/>
+      <stop offset="55%" stop-color="#2ecf54"/>
+      <stop offset="100%" stop-color="#158032"/>
+    </linearGradient>
+    <linearGradient id="vineGlow" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#26a648" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#8aff9e" stop-opacity="0.75"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main Cream Eggshell Body -->
+  <path d="M 256,24 C 368,24 470,178 470,382 C 470,550 378,618 256,618 C 134,618 42,550 42,382 C 42,178 144,24 256,24 Z" fill="url(#natureBaseGrad)"/>
+  <path d="M 256,24 C 368,24 470,178 470,382 C 470,550 378,618 256,618 C 134,618 42,550 42,382 C 42,178 144,24 256,24 Z" fill="url(#natureAmbient)"/>
+
+  <!-- Subtle Nature Shell Speckles -->
+  <g fill="#7fa368" opacity="0.32">
+    <circle cx="345" cy="185" r="4.5"/>
+    <circle cx="372" cy="212" r="2.8"/>
+    <circle cx="395" cy="305" r="5.0"/>
+    <circle cx="145" cy="295" r="3.8"/>
+    <circle cx="122" cy="368" r="3.2"/>
+    <circle cx="368" cy="465" r="4.8"/>
+    <circle cx="165" cy="485" r="4.0"/>
+  </g>
+
+  <!-- Decorative Glowing Nature Vines & Leaves Embracing Lower Shell -->
+  <path d="M 92,495 Q 150,445 215,485 T 345,465 Q 395,440 432,475" fill="none" stroke="url(#vineGlow)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M 118,542 Q 185,510 262,538 T 398,520" fill="none" stroke="#229942" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Cute Cartoon Leaves on the Shell -->
+  <g stroke="#144d24" stroke-width="4" stroke-linejoin="round">
+    <path d="M 145,468 C 125,438 152,415 178,432 C 175,455 162,468 145,468 Z" fill="url(#leafGrad)"/>
+    <path d="M 352,458 C 362,425 395,418 402,445 C 385,462 368,465 352,458 Z" fill="url(#leafGrad)"/>
+    <path d="M 248,535 C 232,505 258,488 278,505 C 276,525 262,535 248,535 Z" fill="url(#leafGrad)"/>
+    <!-- Top Crown Sprout Leaf Accents -->
+    <path d="M 256,34 C 228,4 198,18 212,44 C 228,50 245,44 256,34 Z" fill="url(#leafGrad)"/>
+    <path d="M 258,34 C 284,2 316,14 302,42 C 286,50 268,44 258,34 Z" fill="url(#leafGrad)"/>
+  </g>
+
+  <!-- Small Dewdrop Gems -->
+  <circle cx="195" cy="495" r="6" fill="#70ffba" opacity="0.85"/>
+  <circle cx="315" cy="490" r="5" fill="#70ffba" opacity="0.85"/>
+</svg>

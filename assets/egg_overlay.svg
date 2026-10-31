@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 640" width="512" height="640">
+  <defs>
+    <linearGradient id="glossGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Primary Glossy Specular Highlight -->
+  <path d="M 190,74 
+           C 128,132 98,225 96,315 
+           C 116,285 135,210 175,148 
+           C 202,108 228,85 245,74 
+           C 226,66 206,65 190,74 Z" 
+        fill="url(#glossGrad)"/>
+
+  <!-- Secondary Soft Specular Oval -->
+  <ellipse cx="164" cy="145" rx="22" ry="44" transform="rotate(-28 164 145)" fill="#ffffff" opacity="0.65"/>
+  <circle cx="132" cy="222" r="11" fill="#ffffff" opacity="0.55"/>
+
+  <!-- Subtle Right Rim Catchlight -->
+  <path d="M 436,310 
+           C 448,390 432,475 390,535 
+           C 418,480 430,400 422,320 Z" 
+        fill="#ffffff" opacity="0.28"/>
+
+  <!-- Crisp Cartoon Outer Outline -->
+  <path d="M 256,24 
+           C 368,24 470,178 470,382 
+           C 470,550 378,618 256,618 
+           C 134,618 42,550 42,382 
+           C 42,178 144,24 256,24 Z" 
+        fill="none" 
+        stroke="#23140d" 
+        stroke-width="16" 
+        stroke-linejoin="round"
+        stroke-linecap="round"/>
+</svg>

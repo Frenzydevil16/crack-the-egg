@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 640" width="512" height="640">
+  <defs>
+    <radialGradient id="crystalBaseGrad" cx="35%" cy="26%" r="72%" fx="28%" fy="20%">
+      <stop offset="0%" stop-color="#e8ffff"/>
+      <stop offset="22%" stop-color="#9cf7ff"/>
+      <stop offset="52%" stop-color="#36b8ff"/>
+      <stop offset="80%" stop-color="#1464d6"/>
+      <stop offset="100%" stop-color="#0b2e82"/>
+    </radialGradient>
+    <linearGradient id="crystalFacet1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.48"/>
+      <stop offset="100%" stop-color="#40e8ff" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="crystalFacet2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7afbff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#072166" stop-opacity="0.42"/>
+    </linearGradient>
+    <linearGradient id="crystalSpikeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0ffff"/>
+      <stop offset="45%" stop-color="#5cf2ff"/>
+      <stop offset="100%" stop-color="#1275e8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Crystal Spikes on Sides and Crown -->
+  <g stroke="#082258" stroke-width="10" stroke-linejoin="round">
+    <!-- Top Crown Crystal Cluster -->
+    <polygon points="256,2 226,56 256,74 286,56" fill="url(#crystalSpikeGrad)"/>
+    <polygon points="205,22 192,72 228,68" fill="#6bf5ff"/>
+    <polygon points="307,22 284,68 320,72" fill="#32baff"/>
+    <!-- Left Crystal Tips -->
+    <polygon points="22,295 62,272 58,338" fill="url(#crystalSpikeGrad)"/>
+    <polygon points="14,375 56,358 58,418" fill="#5ceeff"/>
+    <!-- Right Crystal Tips -->
+    <polygon points="490,295 450,272 454,338" fill="url(#crystalSpikeGrad)"/>
+    <polygon points="498,375 456,358 454,418" fill="#32baff"/>
+  </g>
+
+  <!-- Main Crystalline Egg Body -->
+  <path d="M 256,24 C 368,24 470,178 470,382 C 470,550 378,618 256,618 C 134,618 42,550 42,382 C 42,178 144,24 256,24 Z" fill="url(#crystalBaseGrad)"/>
+
+  <!-- Geometric Crystal Facet Planes Inside Egg -->
+  <polygon points="256,42 152,165 256,235 360,165" fill="url(#crystalFacet1)"/>
+  <polygon points="152,165 78,340 175,410 256,235" fill="url(#crystalFacet1)"/>
+  <polygon points="360,165 256,235 337,410 434,340" fill="url(#crystalFacet2)"/>
+  <polygon points="256,235 175,410 256,565 337,410" fill="url(#crystalFacet1)"/>
+  <polygon points="78,340 112,520 256,565 175,410" fill="url(#crystalFacet2)"/>
+  <polygon points="434,340 337,410 256,565 400,520" fill="url(#crystalFacet2)"/>
+
+  <!-- Glowing Internal Facet Ridge Lines -->
+  <g stroke="#b8ffff" stroke-width="3.5" opacity="0.65" fill="none" stroke-linecap="round">
+    <line x1="256" y1="42" x2="256" y2="235"/>
+    <line x1="152" y1="165" x2="256" y2="235"/>
+    <line x1="360" y1="165" x2="256" y2="235"/>
+    <line x1="256" y1="235" x2="175" y2="410"/>
+    <line x1="256" y1="235" x2="337" y2="410"/>
+    <line x1="175" y1="410" x2="256" y2="565"/>
+    <line x1="337" y1="410" x2="256" y2="565"/>
+  </g>
+
+  <!-- Sparkling Ice Highlights -->
+  <g fill="#ffffff" opacity="0.9">
+    <polygon points="256,110 264,132 286,140 264,148 256,170 248,148 226,140 248,132"/>
+    <polygon points="348,270 353,285 368,290 353,295 348,310 343,295 328,290 343,285"/>
+    <polygon points="155,335 160,348 173,353 160,358 155,371 150,358 137,353 150,348"/>
+  </g>
+</svg>

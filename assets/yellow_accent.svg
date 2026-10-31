@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 300" width="160" height="300">
+  <!-- Accent burst dashes on left or right of egg -->
+  <!-- Upper dash -->
+  <path d="M 120,40 L 40,70 L 48,90 L 128,60 Z" fill="#fecb16" stroke="#2c1a0e" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Middle dash -->
+  <path d="M 140,140 L 20,150 L 20,170 L 140,160 Z" fill="#fecb16" stroke="#2c1a0e" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Lower dash -->
+  <path d="M 120,240 L 40,210 L 48,190 L 128,220 Z" fill="#fecb16" stroke="#2c1a0e" stroke-width="7" stroke-linejoin="round"/>
+</svg>

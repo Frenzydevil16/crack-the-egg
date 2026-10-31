@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <radialGradient id="slimeIconGrad" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#80e5ff"/>
+      <stop offset="55%" stop-color="#1ca3ec"/>
+      <stop offset="100%" stop-color="#0b5999"/>
+    </radialGradient>
+  </defs>
+  <!-- Cute Slime Silhouette -->
+  <path d="M 32,12 
+           C 48,12 56,28 56,42 
+           C 56,51 47,55 32,55 
+           C 17,55 8,51 8,42 
+           C 8,28 16,12 32,12 Z" 
+        fill="url(#slimeIconGrad)" stroke="#112238" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Highlight -->
+  <ellipse cx="22" cy="24" rx="6" ry="3.5" transform="rotate(-30 22 24)" fill="#ffffff" opacity="0.8"/>
+  <!-- Cute Eyes & Smile -->
+  <circle cx="23" cy="36" r="3.5" fill="#112238"/>
+  <circle cx="22" cy="35" r="1.2" fill="#ffffff"/>
+  <circle cx="41" cy="36" r="3.5" fill="#112238"/>
+  <circle cx="40" cy="35" r="1.2" fill="#ffffff"/>
+  <path d="M 28,41 Q 32,45 36,41" fill="none" stroke="#112238" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="gearG" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f1f5ff"/>
+      <stop offset="100%" stop-color="#9fb2d8"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#16223f" stroke-width="4" stroke-linejoin="round" fill="url(#gearG)">
+    <g id="t">
+      <rect x="27" y="4" width="10" height="14" rx="3"/>
+    </g>
+    <use href="#t" transform="rotate(45 32 32)"/>
+    <use href="#t" transform="rotate(90 32 32)"/>
+    <use href="#t" transform="rotate(135 32 32)"/>
+    <use href="#t" transform="rotate(180 32 32)"/>
+    <use href="#t" transform="rotate(225 32 32)"/>
+    <use href="#t" transform="rotate(270 32 32)"/>
+    <use href="#t" transform="rotate(315 32 32)"/>
+  </g>
+  <circle cx="32" cy="32" r="19" fill="url(#gearG)" stroke="#16223f" stroke-width="4"/>
+  <circle cx="32" cy="32" r="8" fill="#3a4c7a" stroke="#16223f" stroke-width="4"/>
+  <ellipse cx="24" cy="22" rx="5" ry="2.5" transform="rotate(-35 24 22)" fill="#ffffff" opacity="0.85"/>
+</svg>
