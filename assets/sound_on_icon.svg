@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="spkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff394"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <path d="M 10,24 L 22,24 L 36,12 L 36,52 L 22,40 L 10,40 Z" fill="url(#spkGrad)" stroke="#1e293b" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 43,22 C 48,27 48,37 43,42" fill="none" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 50,15 C 58,24 58,40 50,49" fill="none" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round"/>
+</svg>

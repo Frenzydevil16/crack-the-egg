@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/mouse_icon.svg-315566dbfea4b6c73b83785d2f93b4
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.85
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

@@ -1,7 +1,7 @@
 [gd_scene load_steps=34 format=3 uid="uid://c6a8r0k1eeggs"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
-[ext_resource type="Texture2D" path="res://assets/background.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/bg_nature.png" id="2_bg"]
 [ext_resource type="Texture2D" path="res://assets/egg.svg" id="3_egg"]
 [ext_resource type="Texture2D" path="res://assets/egg_shadow.svg" id="4_shadow"]
 [ext_resource type="Texture2D" path="res://assets/mouse_icon.svg" id="6_mouse"]
@@ -22,7 +22,7 @@
 [ext_resource type="Texture2D" path="res://assets/upgrades_icon.svg" id="21_upgrades"]
 [ext_resource type="Texture2D" path="res://assets/settings_icon.svg" id="22_settings"]
 [ext_resource type="Texture2D" path="res://assets/play_icon.svg" id="23_play"]
-[ext_resource type="Texture2D" path="res://assets/slimes/slime_mythic_alpha.png" id="24_mythic"]
+[ext_resource type="Texture2D" path="res://assets/slimes/cosmic_mythic.png" id="24_mythic"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill"]
 bg_color = Color(0.06, 0.11, 0.24, 0.94)
@@ -306,7 +306,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_pill")
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.97, 1, 1)
 theme_override_font_sizes/font_size = 16
-text = "⚡ 1x Klick | 🍀 Standard"
+text = "1x Klick  •  Standard"
 
 [node name="BoosterStatusBar" type="HBoxContainer" parent="SafeContainer/TopLeftBar"]
 layout_mode = 2
@@ -707,7 +707,7 @@ layout_mode = 2
 theme_override_colors/font_outline_color = Color(0.05, 0.06, 0.12, 1)
 theme_override_constants/outline_size = 7
 theme_override_font_sizes/font_size = 22
-text = "★ RARE (7%) ★"
+text = "• RARE (7%) •"
 horizontal_alignment = 1
 
 [node name="SlimeHolder" type="Control" parent="DropRevealOverlay/CenterContainer/DropCard/VBox"]
@@ -833,7 +833,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.86, 0.22, 1)
 theme_override_font_sizes/font_size = 25
-text = "🛒 SHOP & UPGRADES"
+text = "SHOP & UPGRADES"
 
 [node name="CoinBox" type="HBoxContainer" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/TopBar"]
 layout_mode = 2
@@ -855,7 +855,7 @@ text = "300 Münzen"
 [node name="CloseShopButton" type="Button" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox/TopBar"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
-text = "✕ Schließen"
+text = "Schließen"
 
 [node name="TabBar" type="HBoxContainer" parent="ShopOverlay/CenterContainer/ShopPanel/MainVBox"]
 layout_mode = 2
@@ -935,7 +935,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.45, 0.88, 1, 1)
 theme_override_font_sizes/font_size = 25
-text = "📘 SLIME-SAMMLUNG"
+text = "SLIME-SAMMLUNG"
 
 [node name="SummaryLabel" type="Label" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox/TopBar"]
 layout_mode = 2
@@ -946,7 +946,7 @@ text = "Freigeschaltet: 0 / 6"
 [node name="CloseCollectionButton" type="Button" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox/TopBar"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
-text = "✕ Schließen"
+text = "Schließen"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CollectionOverlay/CenterContainer/CollectionPanel/MainVBox"]
 layout_mode = 2
@@ -1003,12 +1003,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.95, 0.96, 1, 1)
 theme_override_font_sizes/font_size = 25
-text = "⚙ EINSTELLUNGEN"
+text = "EINSTELLUNGEN"
 
 [node name="CloseSettingsButton" type="Button" parent="SettingsOverlay/CenterContainer/SettingsPanel/MainVBox/TopBar"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
-text = "✕ Schließen"
+text = "Schließen"
 
 [node name="OptionsVBox" type="VBoxContainer" parent="SettingsOverlay/CenterContainer/SettingsPanel/MainVBox"]
 layout_mode = 2
@@ -1074,7 +1074,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.3, 1)
 theme_override_font_sizes/font_size = 18
-text = "🪙 300 Münzen"
+text = "300 Münzen"
 
 [node name="MenuSlimePill" type="PanelContainer" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox/TopStatsBar"]
 layout_mode = 2
@@ -1084,7 +1084,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.92, 1, 1)
 theme_override_font_sizes/font_size = 18
-text = "📘 Slimes: 0 / 6"
+text = "Slimes: 0 / 6"
 
 [node name="MenuTitle" type="Label" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]
 layout_mode = 2
@@ -1101,7 +1101,7 @@ theme_override_colors/font_color = Color(0.88, 0.95, 1, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.18, 1)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 20
-text = "✨ 10.000 Klicks • Magische Slime-Welt ✨"
+text = "• 10.000 Klicks • Magische Slime-Welt •"
 horizontal_alignment = 1
 
 [node name="HeroStage" type="Control" parent="MainMenuOverlay/CenterContainer/MenuCard/VBox"]

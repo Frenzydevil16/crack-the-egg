@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/wheel_frame_ui.png-c6e81fec598a120a5103751f74
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.85
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
