@@ -55,6 +55,34 @@ func _init_layers() -> void:
 					2: col = Color(0.28, 0.95, 1.0, 0.85)
 					_: col = Color(0.72, 0.48, 1.0, 0.82)
 				shape_type = 2 if (i % 2 == 0) else 1
+			"forest":
+				match palette_idx:
+					0: col = Color(0.35, 0.95, 1.0, 0.85)
+					1: col = Color(0.85, 0.40, 1.0, 0.82)
+					2: col = Color(0.40, 1.0, 0.65, 0.80)
+					_: col = Color(1.0, 0.92, 0.45, 0.85)
+				shape_type = 3 if (i % 2 == 0) else 0
+			"ocean":
+				match palette_idx:
+					0: col = Color(1.0, 0.85, 0.45, 0.88)
+					1: col = Color(0.35, 0.95, 1.0, 0.82)
+					2: col = Color(1.0, 0.60, 0.75, 0.80)
+					_: col = Color(1.0, 0.96, 0.85, 0.90)
+				shape_type = 2 if (i % 3 == 0) else 0
+			"magma":
+				match palette_idx:
+					0: col = Color(1.0, 0.45, 0.15, 0.92)
+					1: col = Color(1.0, 0.75, 0.20, 0.90)
+					2: col = Color(1.0, 0.25, 0.10, 0.85)
+					_: col = Color(1.0, 0.95, 0.40, 0.95)
+				shape_type = 1 if (i % 2 == 0) else 2
+			"celestial":
+				match palette_idx:
+					0: col = Color(1.0, 0.70, 0.85, 0.90)
+					1: col = Color(1.0, 0.92, 0.50, 0.92)
+					2: col = Color(0.65, 0.85, 1.0, 0.85)
+					_: col = Color(1.0, 1.0, 1.0, 0.95)
+				shape_type = 3 if (i % 2 == 0) else 2
 			_: # "nature"
 				match palette_idx:
 					0: col = Color(1.0, 0.96, 0.55, 0.84)
@@ -84,6 +112,14 @@ func _init_layers() -> void:
 				fc_col = Color(0.28, 0.92, 1.0, 0.46) if px < 0.5 else Color(0.45, 0.78, 1.0, 0.46)
 			"cosmic":
 				fc_col = Color(0.88, 0.35, 1.0, 0.44) if px < 0.5 else Color(0.32, 0.92, 1.0, 0.44)
+			"forest":
+				fc_col = Color(0.40, 0.95, 0.70, 0.44) if px < 0.5 else Color(0.75, 0.45, 0.95, 0.44)
+			"ocean":
+				fc_col = Color(0.35, 0.90, 0.95, 0.44) if px < 0.5 else Color(1.0, 0.70, 0.50, 0.44)
+			"magma":
+				fc_col = Color(1.0, 0.45, 0.20, 0.44) if px < 0.5 else Color(1.0, 0.75, 0.25, 0.44)
+			"celestial":
+				fc_col = Color(1.0, 0.75, 0.85, 0.44) if px < 0.5 else Color(1.0, 0.90, 0.55, 0.44)
 			_:
 				fc_col = Color(0.38, 0.95, 0.65, 0.44) if px < 0.5 else Color(0.55, 0.98, 0.72, 0.42)
 		flora_clusters.append({

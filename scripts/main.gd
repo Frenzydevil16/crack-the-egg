@@ -174,6 +174,7 @@ var pet_inventory_grid: GridContainer
 var pet_inv_scroll: ScrollContainer
 var pet_token_label: Label
 var pet_spin_button: Button
+var pet_spin_title_label: Label
 var pet_spin_dim_rect: ColorRect
 var wheel_stage_wrap: Control
 var wheel_stage_root: Control
@@ -212,16 +213,37 @@ var equipped_particle_style: String = "part_gold"
 var equipped_bg_theme: String = "bg_day"
 var equipped_reveal_aura: String = "aura_normal"
 
+# Background Shop System (Custom high-end atmospheric landscapes)
+var owned_backgrounds: Array[String] = ["bg_world_default"]
+var equipped_custom_bg: String = "bg_world_default"
+
 # Slime Collection & Inventory (18 unique slimes across 3 eggs)
 var slime_counts: Dictionary = {}
 var slime_unseen: Dictionary = {} # slime_id -> bool
 
-# User Settings (persisted in save v3)
-var setting_sfx_volume: float = 1.0
+# User Settings & Sound System (persisted in save v3)
+var setting_sfx_volume: float = 0.80
+var setting_music_volume: float = 0.70
+var setting_audio_muted: bool = false
 var setting_particles_enabled: bool = true
 var setting_reduced_shake: bool = false
 var setting_game_zoom: float = 1.0
 var _yt_audio_allowed: bool = true
+
+# Sound & Music Management
+var owned_click_sounds: Array[String] = ["click_crisp"]
+var equipped_click_sound: String = "click_crisp"
+var _click_sound_streams: Dictionary = {}
+var bgm_player: AudioStreamPlayer
+var preview_player: AudioStreamPlayer
+var sound_hud_btn: Button
+var sound_modal_overlay: ColorRect
+var sound_modal_panel: PanelContainer
+var sound_music_slider: HSlider
+var sound_music_pct_lbl: Label
+var sound_sfx_slider: HSlider
+var sound_sfx_pct_lbl: Label
+var sound_mute_toggle_btn: Button
 
 # Click streak tracking for dynamic side effects
 var _click_streak: int = 0
@@ -332,6 +354,53 @@ const SHOP_CATALOG: Dictionary = {
 			"title": "Mythic Luck",
 			"desc": "Ultimatives Glück: Epic 16%, Legendary 8,5% und Mythic 3,5% Chance!",
 			"price": 50000
+		}
+	],
+	"backgrounds": [
+		{
+			"id": "bg_world_default",
+			"title": "Standard Welten (Auto)",
+			"desc": "Wechselt automatisch zwischen Natur-, Kristall- und Kosmoswelt je nach aktivem Ei.",
+			"price": 0,
+			"path": "",
+			"thumb": "res://assets/backgrounds/bg_default_thumb.png",
+			"theme": "default"
+		},
+		{
+			"id": "bg_forest",
+			"title": "Magischer Zauberwald",
+			"desc": "Mystischer Dämmerungswald mit leuchtenden Riesenpilzen, uralten Moosbäumen und schwebenden Irrlichtern.",
+			"price": 5000,
+			"path": "res://assets/backgrounds/bg_forest.png",
+			"thumb": "res://assets/backgrounds/bg_forest_thumb.png",
+			"theme": "forest"
+		},
+		{
+			"id": "bg_ocean",
+			"title": "Sonnenuntergang am Meer",
+			"desc": "Traumhafter Tropenstrand zur goldenen Stunde mit glitzernden Wellen, Himmelsinseln und Seesternen.",
+			"price": 15000,
+			"path": "res://assets/backgrounds/bg_ocean.png",
+			"thumb": "res://assets/backgrounds/bg_ocean_thumb.png",
+			"theme": "ocean"
+		},
+		{
+			"id": "bg_magma",
+			"title": "Vulkan & Obsidian-Heiligtum",
+			"desc": "Glühende Lavakaskaden, uralte Runensäulen und schwebende Funken in einer monumentalen Obsidian-Höhle.",
+			"price": 35000,
+			"path": "res://assets/backgrounds/bg_magma.png",
+			"thumb": "res://assets/backgrounds/bg_magma_thumb.png",
+			"theme": "magma"
+		},
+		{
+			"id": "bg_celestial",
+			"title": "Himmlischer Wolkenpalast",
+			"desc": "Majestätischer Marmor-Schrein über den Wolken mit Kirschblüten, Himmelsringen und goldenen Sonnenstrahlen.",
+			"price": 75000,
+			"path": "res://assets/backgrounds/bg_celestial.png",
+			"thumb": "res://assets/backgrounds/bg_celestial_thumb.png",
+			"theme": "celestial"
 		}
 	],
 	"cosmetics": [
@@ -447,6 +516,57 @@ const SHOP_CATALOG: Dictionary = {
 			"desc": "Zusätzliche Schockwellen & Sternenpartikel beim Schlüpfen (Rein optisch).",
 			"price": 3500
 		}
+	],
+	"sounds": [
+		{
+			"id": "click_crisp",
+			"file": "res://assets/audio/click_crisp.wav",
+			"title": "Knackiger Klick",
+			"desc": "Präziser, satter Holz-Klick. Schnell und knackig bei jedem Tippen.",
+			"price": 0
+		},
+		{
+			"id": "click_pop",
+			"file": "res://assets/audio/click_pop.wav",
+			"title": "Sanfter Pop",
+			"desc": "Weicher organischer Bläschen-Pop. Angenehm sanft für lange Klicksessions.",
+			"price": 500
+		},
+		{
+			"id": "click_plopp",
+			"file": "res://assets/audio/click_plopp.wav",
+			"title": "Lustiger Plopp",
+			"desc": "Spritziger Cartoon-Ton mit elastischem Up-Sweep. Macht sofort gute Laune!",
+			"price": 1500
+		},
+		{
+			"id": "click_magic",
+			"file": "res://assets/audio/click_magic.wav",
+			"title": "Magischer Zauberfunke",
+			"desc": "Glitzernder Feenstaub-Akkord mit feinem Schimmer. Verzaubert jeden Klick.",
+			"price": 4000
+		},
+		{
+			"id": "click_crystal",
+			"file": "res://assets/audio/click_crystal.wav",
+			"title": "Kristalliner Klang",
+			"desc": "Klarer Quarzglas-Schlag mit seidigem, harmonischem Nachhall.",
+			"price": 10000
+		},
+		{
+			"id": "click_scifi",
+			"file": "res://assets/audio/click_scifi.wav",
+			"title": "Futuristischer Impuls",
+			"desc": "Holografischer Cyber-Blip aus der Zukunft. Prägnant und ultra-modern.",
+			"price": 25000
+		},
+		{
+			"id": "click_celestial",
+			"file": "res://assets/audio/click_celestial.wav",
+			"title": "Göttlicher Äther-Klang",
+			"desc": "Seltener 528 Hz Gold-Akkord mit himmlischen Obertönen. Das ultimative Klick-Erlebnis!",
+			"price": 60000
+		}
 	]
 }
 
@@ -458,11 +578,16 @@ func _ready() -> void:
 	_build_egg_selection_ui()
 	_build_collection_filter_bar()
 	_build_pet_system_ui()
+	_build_sound_modal_ui()
 
 	_spawn_pet_companion()
 
 	# Load local save state
 	_load_local_data()
+
+	# Setup Audio Bus & Player Infrastructure
+	_setup_audio_system()
+	_setup_sound_hud_button()
 
 	# Reparent power_pill and booster_status_bar into header_container
 	# so they are symmetrically centered above the egg and never collide with top buttons/pills!
@@ -488,6 +613,8 @@ func _ready() -> void:
 		collection_overlay.visible = false
 	if settings_overlay:
 		settings_overlay.visible = false
+	if sound_modal_overlay:
+		sound_modal_overlay.visible = false
 	if egg_select_overlay:
 		egg_select_overlay.visible = false
 	if main_menu_overlay:
@@ -503,6 +630,31 @@ func _ready() -> void:
 	if milestone_banner:
 		milestone_banner.modulate.a = 0.0
 
+	# Ensure all modal overlays and scrims are on an elevated layer (z_index 40+)
+	# so that pet_companion (z_index 0) is strictly underneath and never rendered on top of menus!
+	var overlays: Array[CanvasItem] = [
+		drop_dim_scrim,
+		drop_overlay,
+		shop_overlay,
+		collection_overlay,
+		settings_overlay,
+		sound_modal_overlay,
+		egg_select_overlay,
+		main_menu_overlay,
+		pet_modal_overlay,
+		pause_overlay
+	]
+	for ov in overlays:
+		if ov:
+			ov.z_index = 40
+			ov.z_as_relative = false
+	if flash_overlay:
+		flash_overlay.z_index = 60
+		flash_overlay.z_as_relative = false
+
+	# Start background music if allowed
+	_start_bgm_if_needed()
+
 	# Connect egg click area
 	if egg_touch_area:
 		egg_touch_area.gui_input.connect(_on_egg_gui_input)
@@ -510,8 +662,11 @@ func _ready() -> void:
 	# Connect Pets HUD Button in Top Left Bar
 	if top_left_bar and not pets_hud_btn:
 		pets_hud_btn = Button.new()
-		pets_hud_btn.custom_minimum_size = Vector2(104, 48)
-		pets_hud_btn.text = "🐾 Pets"
+		pets_hud_btn.custom_minimum_size = Vector2(92, 48)
+		pets_hud_btn.text = "Pets"
+		if ResourceLoader.exists("res://assets/pet_icon.svg"):
+			pets_hud_btn.icon = load("res://assets/pet_icon.svg")
+			pets_hud_btn.expand_icon = true
 		UIKit.style_button(pets_hud_btn, "orange", 16, 16, 12.0, 5.0)
 		pets_hud_btn.pressed.connect(func():
 			_opened_from_main_menu = false
@@ -702,14 +857,26 @@ func is_egg_unlocked(egg_id: String) -> bool:
 
 func _apply_world_visuals(egg_id: String, animate_transition: bool = false) -> void:
 	var w_cfg: Dictionary = EGG_WORLDS.get(egg_id, EGG_WORLDS["nature"])
-	if background_rect and ResourceLoader.exists(w_cfg["bg_texture"]):
-		background_rect.texture = load(w_cfg["bg_texture"])
+	if background_rect:
+		if equipped_custom_bg != "bg_world_default":
+			var bg_item = _get_background_by_id(equipped_custom_bg)
+			if not bg_item.is_empty() and ResourceLoader.exists(bg_item.get("path", "")):
+				background_rect.texture = load(bg_item["path"])
+			elif ResourceLoader.exists(w_cfg["bg_texture"]):
+				background_rect.texture = load(w_cfg["bg_texture"])
+		elif ResourceLoader.exists(w_cfg["bg_texture"]):
+			background_rect.texture = load(w_cfg["bg_texture"])
 	if egg_sprite and ResourceLoader.exists(w_cfg["egg_texture"]):
 		egg_sprite.texture = load(w_cfg["egg_texture"])
 	if hero_egg and ResourceLoader.exists(w_cfg["egg_texture"]):
 		hero_egg.texture = load(w_cfg["egg_texture"])
 	if world_backdrop:
-		world_backdrop.set_world_theme(egg_id)
+		if equipped_custom_bg != "bg_world_default":
+			var bg_item = _get_background_by_id(equipped_custom_bg)
+			var th = bg_item.get("theme", egg_id)
+			world_backdrop.set_world_theme(th)
+		else:
+			world_backdrop.set_world_theme(egg_id)
 	if side_click_fx:
 		side_click_fx.set_world_theme(egg_id)
 	if fancy_bar:
@@ -729,10 +896,14 @@ func _apply_visual_overhaul_theme() -> void:
 	# Style Top Bar Buttons & Pills using modern UIKit
 	UIKit.style_button(menu_btn, "purple", 18, 22, 14.0, 8.0)
 	UIKit.style_button(collection_btn, "blue", 18, 22, 14.0, 8.0)
+	if pets_hud_btn:
+		UIKit.style_button(pets_hud_btn, "orange", 18, 22, 12.0, 8.0)
 	if eggs_hud_btn:
 		UIKit.style_button(eggs_hud_btn, "green", 18, 22, 14.0, 8.0)
 	UIKit.style_button(shop_btn, "orange", 20, 22, 16.0, 8.0)
 	UIKit.style_button(settings_btn, "navy", 18, 22, 10.0, 8.0)
+	if sound_hud_btn:
+		UIKit.style_button(sound_hud_btn, "navy", 18, 22, 10.0, 8.0)
 
 	var pill_world_kind = "pill_world"
 	if active_egg_id == "crystal":
@@ -837,6 +1008,11 @@ func _process(delta: float) -> void:
 				var egg_pos = egg_container.size * 0.5 if egg_container else Vector2.ZERO
 				_apply_effective_clicks(1, egg_pos, false)
 
+	# Keep pet companion visibility synced with modal states:
+	# Stay underneath and hidden whenever any modal/settings/menu is open,
+	# and restore cleanly when in main game view if a pet is equipped.
+	_sync_pet_companion_visibility()
+
 	# 3. Click streak decay for random left/right click effects
 	if _click_streak > 0:
 		_streak_decay_timer -= delta
@@ -861,6 +1037,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_close_pet_modal()
 		elif settings_overlay and settings_overlay.visible:
 			_close_settings()
+		elif sound_modal_overlay and sound_modal_overlay.visible:
+			_close_sound_modal()
 		elif shop_overlay and shop_overlay.visible:
 			_close_shop()
 		elif collection_overlay and collection_overlay.visible:
@@ -868,8 +1046,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif main_menu_overlay and main_menu_overlay.visible:
 			_close_main_menu()
 
+func _sync_pet_companion_visibility() -> void:
+	if pet_companion:
+		var should_be_visible: bool = (not equipped_pet_id.is_empty()) and (not _is_any_modal_open())
+		if pet_companion.visible != should_be_visible:
+			pet_companion.visible = should_be_visible
+
 func _is_any_modal_open() -> bool:
-	if get_tree().paused:
+	var tree = get_tree()
+	if tree and tree.paused:
+		return true
+	if pause_overlay and pause_overlay.visible:
 		return true
 	if egg_select_overlay and egg_select_overlay.visible:
 		return true
@@ -881,9 +1068,13 @@ func _is_any_modal_open() -> bool:
 		return true
 	if settings_overlay and settings_overlay.visible:
 		return true
+	if sound_modal_overlay and sound_modal_overlay.visible:
+		return true
 	if main_menu_overlay and main_menu_overlay.visible:
 		return true
 	if drop_overlay and drop_overlay.visible:
+		return true
+	if wheel_reveal_overlay and wheel_reveal_overlay.visible:
 		return true
 	if is_revealing_drop:
 		return true
@@ -907,6 +1098,7 @@ func _open_main_menu() -> void:
 		menu_aura.start_reveal("mythic", true)
 	UIKit.open_overlay(main_menu_overlay, menu_card)
 	_start_menu_hero_animation()
+	_sync_pet_companion_visibility()
 
 func _close_main_menu() -> void:
 	if _menu_hero_tween and _menu_hero_tween.is_valid():
@@ -914,6 +1106,7 @@ func _close_main_menu() -> void:
 	if menu_aura:
 		menu_aura.stop_reveal()
 	UIKit.close_overlay(main_menu_overlay, menu_card)
+	_sync_pet_companion_visibility()
 
 func _update_main_menu_content() -> void:
 	if menu_coin_label:
@@ -978,9 +1171,11 @@ func _open_settings() -> void:
 		collection_overlay.visible = false
 	_populate_settings_modal()
 	UIKit.open_overlay(settings_overlay, settings_panel)
+	_sync_pet_companion_visibility()
 
 func _close_settings() -> void:
 	UIKit.close_overlay(settings_overlay, settings_panel)
+	_sync_pet_companion_visibility()
 	if _opened_from_main_menu:
 		_opened_from_main_menu = false
 		_open_main_menu()
@@ -1064,38 +1259,138 @@ func _populate_settings_modal() -> void:
 
 	settings_options_vbox.add_child(zoom_card)
 
-	# 2. Sound Volume Row
+	# 2. Music Volume Row
+	var music_card := PanelContainer.new()
+	UIKit.style_panel(music_card, "card", 18.0, 12.0)
+	var music_vbox := VBoxContainer.new()
+	music_vbox.add_theme_constant_override("separation", 8)
+	music_card.add_child(music_vbox)
+
+	var music_header := HBoxContainer.new()
+	music_header.add_theme_constant_override("separation", 10)
+	music_vbox.add_child(music_header)
+
+	var music_title_lbl := Label.new()
+	music_title_lbl.text = "🎼 Musik-Lautstärke"
+	music_title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	UIKit.style_label(music_title_lbl, 19, Color.WHITE, 5)
+	music_header.add_child(music_title_lbl)
+
+	var music_pct_lbl := Label.new()
+	music_pct_lbl.text = "%d %%" % int(round(setting_music_volume * 100.0))
+	UIKit.style_label(music_pct_lbl, 19, Color("#ffe047"), 5)
+	music_header.add_child(music_pct_lbl)
+
+	var music_slider_hbox := HBoxContainer.new()
+	music_slider_hbox.add_theme_constant_override("separation", 10)
+	music_vbox.add_child(music_slider_hbox)
+
+	var music_min_lbl := Label.new()
+	music_min_lbl.text = "0%"
+	UIKit.style_label(music_min_lbl, 14, Color(0.75, 0.84, 0.95), 3)
+	music_slider_hbox.add_child(music_min_lbl)
+
+	var music_slider := HSlider.new()
+	music_slider.min_value = 0.0
+	music_slider.max_value = 1.0
+	music_slider.step = 0.01
+	music_slider.value = setting_music_volume
+	music_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	music_slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	UIKit.style_slider(music_slider)
+	music_slider_hbox.add_child(music_slider)
+
+	var music_max_lbl := Label.new()
+	music_max_lbl.text = "100%"
+	UIKit.style_label(music_max_lbl, 14, Color(0.75, 0.84, 0.95), 3)
+	music_slider_hbox.add_child(music_max_lbl)
+
+	music_slider.value_changed.connect(func(new_val: float):
+		setting_music_volume = clampf(new_val, 0.0, 1.0)
+		music_pct_lbl.text = "%d %%" % int(round(setting_music_volume * 100.0))
+		_apply_audio_state(_yt_audio_allowed)
+		_save_progress()
+	)
+	settings_options_vbox.add_child(music_card)
+
+	# 3. SFX Volume Row
 	var sfx_card := PanelContainer.new()
 	UIKit.style_panel(sfx_card, "card", 18.0, 12.0)
-	var sfx_hbox := HBoxContainer.new()
-	sfx_hbox.add_theme_constant_override("separation", 12)
-	sfx_card.add_child(sfx_hbox)
-	var sfx_lbl := Label.new()
-	sfx_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	sfx_lbl.text = "🔊 Sound-Lautstärke"
-	UIKit.style_label(sfx_lbl, 19, Color.WHITE, 5)
-	sfx_hbox.add_child(sfx_lbl)
-	var sfx_btn := Button.new()
-	sfx_btn.custom_minimum_size = Vector2(150, 46)
-	var pct_int := int(round(setting_sfx_volume * 100.0))
-	sfx_btn.text = "Stumm (0%)" if pct_int <= 0 else ("%d %%" % pct_int)
-	UIKit.style_button(sfx_btn, "green" if pct_int > 0 else "gray", 18, 18, 14.0, 6.0)
-	sfx_btn.pressed.connect(func():
-		if setting_sfx_volume > 0.85:
-			setting_sfx_volume = 0.7
-		elif setting_sfx_volume > 0.5:
-			setting_sfx_volume = 0.35
-		elif setting_sfx_volume > 0.1:
-			setting_sfx_volume = 0.0
-		else:
-			setting_sfx_volume = 1.0
-		_apply_user_settings()
-		_play_tap_audio()
+	var sfx_vbox := VBoxContainer.new()
+	sfx_vbox.add_theme_constant_override("separation", 8)
+	sfx_card.add_child(sfx_vbox)
+
+	var sfx_header := HBoxContainer.new()
+	sfx_header.add_theme_constant_override("separation", 10)
+	sfx_vbox.add_child(sfx_header)
+
+	var sfx_title_lbl := Label.new()
+	sfx_title_lbl.text = "🔊 Soundeffekte & Klicks"
+	sfx_title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	UIKit.style_label(sfx_title_lbl, 19, Color.WHITE, 5)
+	sfx_header.add_child(sfx_title_lbl)
+
+	var sfx_pct_lbl := Label.new()
+	sfx_pct_lbl.text = "%d %%" % int(round(setting_sfx_volume * 100.0))
+	UIKit.style_label(sfx_pct_lbl, 19, Color("#ffe047"), 5)
+	sfx_header.add_child(sfx_pct_lbl)
+
+	var sfx_slider_hbox := HBoxContainer.new()
+	sfx_slider_hbox.add_theme_constant_override("separation", 10)
+	sfx_vbox.add_child(sfx_slider_hbox)
+
+	var sfx_min_lbl := Label.new()
+	sfx_min_lbl.text = "0%"
+	UIKit.style_label(sfx_min_lbl, 14, Color(0.75, 0.84, 0.95), 3)
+	sfx_slider_hbox.add_child(sfx_min_lbl)
+
+	var sfx_slider := HSlider.new()
+	sfx_slider.min_value = 0.0
+	sfx_slider.max_value = 1.0
+	sfx_slider.step = 0.01
+	sfx_slider.value = setting_sfx_volume
+	sfx_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sfx_slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	UIKit.style_slider(sfx_slider)
+	sfx_slider_hbox.add_child(sfx_slider)
+
+	var sfx_max_lbl := Label.new()
+	sfx_max_lbl.text = "100%"
+	UIKit.style_label(sfx_max_lbl, 14, Color(0.75, 0.84, 0.95), 3)
+	sfx_slider_hbox.add_child(sfx_max_lbl)
+
+	sfx_slider.value_changed.connect(func(new_val: float):
+		setting_sfx_volume = clampf(new_val, 0.0, 1.0)
+		sfx_pct_lbl.text = "%d %%" % int(round(setting_sfx_volume * 100.0))
+		_apply_audio_state(_yt_audio_allowed)
 		_save_progress()
-		_populate_settings_modal()
 	)
-	sfx_hbox.add_child(sfx_btn)
 	settings_options_vbox.add_child(sfx_card)
+
+	# 4. Mute Button Row
+	var mute_card := PanelContainer.new()
+	UIKit.style_panel(mute_card, "card", 18.0, 12.0)
+	var mute_hbox := HBoxContainer.new()
+	mute_hbox.add_theme_constant_override("separation", 12)
+	mute_card.add_child(mute_hbox)
+	var mute_lbl := Label.new()
+	mute_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mute_lbl.text = "🔇 Stummschaltung"
+	UIKit.style_label(mute_lbl, 19, Color.WHITE, 5)
+	mute_hbox.add_child(mute_lbl)
+	var mute_btn := Button.new()
+	mute_btn.custom_minimum_size = Vector2(170, 46)
+	mute_btn.text = "Stumm ✓" if setting_audio_muted else "Ton An"
+	UIKit.style_button(mute_btn, "orange" if setting_audio_muted else "blue", 17, 18, 14.0, 6.0)
+	mute_btn.pressed.connect(func():
+		setting_audio_muted = not setting_audio_muted
+		mute_btn.text = "Stumm ✓" if setting_audio_muted else "Ton An"
+		UIKit.style_button(mute_btn, "orange" if setting_audio_muted else "blue", 17, 18, 14.0, 6.0)
+		_apply_audio_state(_yt_audio_allowed)
+		_save_progress()
+	)
+	mute_hbox.add_child(mute_btn)
+	settings_options_vbox.add_child(mute_card)
 
 	# 3. Particles & Background Effects Row
 	var part_card := PanelContainer.new()
@@ -1190,7 +1485,10 @@ func _on_viewport_size_changed() -> void:
 	_update_responsive_layout()
 
 func _update_responsive_layout() -> void:
-	var vp_size = get_viewport().get_visible_rect().size
+	var vp = get_viewport()
+	if not vp:
+		return
+	var vp_size = vp.get_visible_rect().size
 	# Defense against 0x0 initial viewport height in YouTube WebView / Test Suite
 	if vp_size.x <= 0 or vp_size.y <= 0:
 		return
@@ -1217,56 +1515,88 @@ func _update_responsive_layout() -> void:
 	var play_w = max(260.0, vp_size.x - safe_side * 2.0)
 	var play_h = max(260.0, vp_size.y - safe_top - safe_bottom)
 
-	if pet_companion and pet_companion.visible:
+	if pet_companion:
 		pet_companion.scale = Vector2(zoom, zoom)
 		pet_companion.position = Vector2(maxf(10.0, (vp_size.x * 0.5) - 250.0 * zoom), (vp_size.y * 0.5) + 60.0 * zoom)
 
-	# Buttons & HUD Scaling according to Game Zoom (Buttons and Egg bigger!)
-	var btn_h = (42.0 if is_tiny else (46.0 if is_compact else 50.0)) * zoom
-	var btn_font = int(round((13 if is_tiny else (15 if is_compact else 17)) * zoom))
-	var pill_font = int(round((15 if is_tiny else (17 if is_compact else 21)) * zoom))
+	# Buttons & HUD Scaling: Responsive to screen width, decoupled from game zoom!
+	# Game zoom scales the central egg, pet companion, shards & progress bar,
+	# while top navigation buttons remain crisp and never collide or hide each other.
+	var avail_top_w: float = maxf(260.0, vp_size.x - safe_side * 2.0)
+	var needed_top_w: float = 730.0 if not is_compact else (654.0 if not is_tiny else 572.0)
+	var hud_scale: float = clampf(avail_top_w / needed_top_w, 0.65, 1.0)
+
+	var btn_h = (42.0 if is_tiny else (46.0 if is_compact else 50.0)) * hud_scale
+	var btn_font = int(round((13 if is_tiny else (15 if is_compact else 16)) * hud_scale))
+	var pill_font = int(round((14 if is_tiny else (16 if is_compact else 18)) * hud_scale))
 
 	if menu_btn:
-		menu_btn.custom_minimum_size = Vector2((80.0 if is_tiny else (96.0 if is_compact else 114.0)) * zoom, btn_h)
+		menu_btn.custom_minimum_size = Vector2((78.0 if is_tiny else (92.0 if is_compact else 104.0)) * hud_scale, btn_h)
 		menu_btn.add_theme_font_size_override("font_size", btn_font)
 	if collection_btn:
-		collection_btn.custom_minimum_size = Vector2((100.0 if is_tiny else (120.0 if is_compact else 144.0)) * zoom, btn_h)
+		collection_btn.custom_minimum_size = Vector2((96.0 if is_tiny else (116.0 if is_compact else 132.0)) * hud_scale, btn_h)
 		collection_btn.add_theme_font_size_override("font_size", btn_font)
-	if eggs_hud_btn:
-		eggs_hud_btn.custom_minimum_size = Vector2((74.0 if is_tiny else (86.0 if is_compact else 96.0)) * zoom, btn_h)
-		eggs_hud_btn.add_theme_font_size_override("font_size", btn_font)
-	if shop_btn:
-		shop_btn.custom_minimum_size = Vector2((90.0 if is_tiny else (106.0 if is_compact else 126.0)) * zoom, btn_h)
-	if shop_coin_hint:
-		shop_coin_hint.add_theme_font_size_override("font_size", int(round(18 * zoom)))
-	if settings_btn:
-		settings_btn.custom_minimum_size = Vector2((46.0 if is_tiny else (48.0 if is_compact else 52.0)) * zoom, btn_h)
 	if pets_hud_btn:
-		pets_hud_btn.custom_minimum_size = Vector2((74.0 if is_tiny else (86.0 if is_compact else 96.0)) * zoom, btn_h)
+		pets_hud_btn.custom_minimum_size = Vector2((72.0 if is_tiny else (82.0 if is_compact else 92.0)) * hud_scale, btn_h)
 		pets_hud_btn.add_theme_font_size_override("font_size", btn_font)
+	if eggs_hud_btn:
+		eggs_hud_btn.custom_minimum_size = Vector2((68.0 if is_tiny else (76.0 if is_compact else 84.0)) * hud_scale, btn_h)
+		eggs_hud_btn.add_theme_font_size_override("font_size", btn_font)
+
 	if counter_pill:
-		counter_pill.custom_minimum_size = Vector2((80.0 if is_tiny else (90.0 if is_compact else 98.0)) * zoom, btn_h)
+		counter_pill.custom_minimum_size = Vector2((74.0 if is_tiny else (84.0 if is_compact else 92.0)) * hud_scale, btn_h)
 	if counter_label:
 		counter_label.add_theme_font_size_override("font_size", pill_font)
 	if coin_pill:
-		coin_pill.custom_minimum_size = Vector2((92.0 if is_tiny else (104.0 if is_compact else 116.0)) * zoom, btn_h)
+		coin_pill.custom_minimum_size = Vector2((86.0 if is_tiny else (98.0 if is_compact else 108.0)) * hud_scale, btn_h)
 	if coin_label:
 		coin_label.add_theme_font_size_override("font_size", pill_font)
+	if shop_btn:
+		shop_btn.custom_minimum_size = Vector2((84.0 if is_tiny else (98.0 if is_compact else 114.0)) * hud_scale, btn_h)
+	if shop_coin_hint:
+		shop_coin_hint.add_theme_font_size_override("font_size", int(round(16 * hud_scale)))
+	if settings_btn:
+		settings_btn.custom_minimum_size = Vector2((42.0 if is_tiny else (44.0 if is_compact else 48.0)) * hud_scale, btn_h)
+	if sound_hud_btn:
+		sound_hud_btn.custom_minimum_size = Vector2((42.0 if is_tiny else (44.0 if is_compact else 48.0)) * hud_scale, btn_h)
+
+	# Ensure TopLeftBar and TopRightBar take only their actual needed width and never overlap in the middle
+	if top_left_bar:
+		top_left_bar.anchor_left = 0.0
+		top_left_bar.anchor_top = 0.0
+		top_left_bar.anchor_right = 0.0
+		top_left_bar.anchor_bottom = 0.0
+		top_left_bar.offset_left = 0.0
+		top_left_bar.offset_top = 0.0
+		top_left_bar.offset_bottom = btn_h
+		var left_w: float = top_left_bar.get_combined_minimum_size().x
+		top_left_bar.offset_right = left_w
+
+	if top_right_bar:
+		top_right_bar.anchor_left = 1.0
+		top_right_bar.anchor_top = 0.0
+		top_right_bar.anchor_right = 1.0
+		top_right_bar.anchor_bottom = 0.0
+		top_right_bar.offset_top = 0.0
+		top_right_bar.offset_bottom = btn_h
+		top_right_bar.offset_right = 0.0
+		var right_w: float = top_right_bar.get_combined_minimum_size().x
+		top_right_bar.offset_left = -right_w
 
 	if power_pill:
 		power_pill.visible = true
 	if power_badge_label:
-		power_badge_label.add_theme_font_size_override("font_size", int(round(14 * zoom)))
+		power_badge_label.add_theme_font_size_override("font_size", int(round(14 * hud_scale)))
 
 	# Header positioning below top bar so it never collides with buttons
 	if header_container:
-		header_container.offset_top = (58.0 if is_compact else 54.0) * zoom
-		header_container.offset_bottom = header_container.offset_top + ((150.0 if is_compact else 164.0) * zoom)
+		header_container.offset_top = btn_h + 8.0
+		header_container.offset_bottom = header_container.offset_top + ((140.0 if is_compact else 156.0) * min(zoom, 1.15))
 	if title_line1:
-		title_line1.add_theme_font_size_override("font_size", int(round((28 if is_compact else 36) * zoom)))
+		title_line1.add_theme_font_size_override("font_size", int(round((26 if is_compact else 32) * min(zoom, 1.15))))
 	if title_line2:
-		title_line2.add_theme_font_size_override("normal_font_size", int(round((20 if is_compact else 26) * zoom)))
-		title_line2.add_theme_font_size_override("bold_font_size", int(round((20 if is_compact else 26) * zoom)))
+		title_line2.add_theme_font_size_override("normal_font_size", int(round((18 if is_compact else 24) * min(zoom, 1.15))))
+		title_line2.add_theme_font_size_override("bold_font_size", int(round((18 if is_compact else 24) * min(zoom, 1.15))))
 
 	# Center Egg scaling: EggCenterAnchor stays strictly at (0.5, 0.5) of SafeContainer (screen center)
 	if egg_anchor:
@@ -1378,6 +1708,7 @@ func _apply_effective_clicks(gain: int, local_pos: Vector2, is_manual: bool) -> 
 	_sync_active_egg_to_dict()
 
 	if is_manual:
+		_start_bgm_if_needed()
 		var coin_gain = 1 + (4 if (total_lifetime_clicks % 10 == 0) else 0)
 		if not equipped_pet_id.is_empty():
 			var p_data = PetData.get_pet_by_id(equipped_pet_id)
@@ -1606,6 +1937,12 @@ func _spawn_click_sparks(pos: Vector2) -> void:
 # --- Epic Drop System & Finale (Section 6 & 7) ---
 
 func _roll_slime_rarity(for_egg_id: String = "") -> Dictionary:
+	# Secret ??? Slime has an exact 0.5% chance from any egg!
+	if _rng.randf_range(0.0, 100.0) < 0.5:
+		var secret = EggWorldData.get_slime_by_id("secret_slime")
+		if not secret.is_empty():
+			return secret
+
 	var target_egg: String = active_egg_id if for_egg_id.is_empty() else for_egg_id
 	var table_id = active_luck_upgrade if LUCK_TABLES.has(active_luck_upgrade) else "base"
 	var chances: Dictionary = LUCK_TABLES[table_id]["chances"]
@@ -1615,6 +1952,8 @@ func _roll_slime_rarity(for_egg_id: String = "") -> Dictionary:
 	var cumulative: float = 0.0
 	var chosen_rarity: String = "common"
 	for r_key in EggWorldData.RARITY_ORDER:
+		if r_key == "secret":
+			continue
 		cumulative += maxf(0.0, float(chances.get(r_key, 0.0)))
 		if roll <= cumulative:
 			chosen_rarity = r_key
@@ -1752,23 +2091,25 @@ func _present_drop_reveal_menu(slime_data: Dictionary, is_first_unlock: bool, co
 	var r_tier: String = slime_data.get("rarity", "common")
 	var r_color: Color = slime_data["color"]
 	var origin_egg_id: String = slime_data.get("egg_id", active_egg_id)
-	var origin_egg_name: String = EGG_WORLDS.get(origin_egg_id, EGG_WORLDS["nature"])["name"]
+	var origin_egg_name: String = "Alle Eier" if origin_egg_id == "all" else EGG_WORLDS.get(origin_egg_id, EGG_WORLDS["nature"])["name"]
 
 	drop_overlay.visible = true
 	drop_overlay.modulate.a = 0.0
 
 	if drop_effect:
-		drop_effect.start_reveal(r_tier, equipped_reveal_aura == "aura_supernova" or origin_egg_id == "cosmic")
+		drop_effect.start_reveal(r_tier, equipped_reveal_aura == "aura_supernova" or origin_egg_id == "cosmic" or r_tier == "secret")
 
 	if drop_header_label:
 		if not unlocked_egg_notice.is_empty():
 			drop_header_label.text = "EI GEKNACKT! + %s FREIGESCHALTET!" % unlocked_egg_notice.to_upper()
+		elif origin_egg_id == "all":
+			drop_header_label.text = "✨ GEHEIMER MYTHISCHER DROP! ✨"
 		else:
 			drop_header_label.text = "GESCHAFFT! %s GEÖFFNET!" % origin_egg_name.to_upper()
 
 	if drop_rarity_label:
 		var table_chances: Dictionary = LUCK_TABLES.get(active_luck_upgrade, LUCK_TABLES["base"])["chances"]
-		var pct: float = float(table_chances.get(r_tier, slime_data["base_chance"]))
+		var pct: float = float(table_chances.get(r_tier, slime_data.get("base_chance", 0.5)))
 		drop_rarity_label.text = "★ %s (%s%%) • %s ★" % [slime_data["rarity_name"], _format_pct(pct), origin_egg_name]
 		drop_rarity_label.add_theme_color_override("font_color", r_color)
 
@@ -1902,9 +2243,11 @@ func _setup_shop_tabs() -> void:
 	if not shop_tab_bar:
 		return
 	var tabs = [
-		{ "id": "clicks", "label": "⚡ Klick-Kraft", "pal": "orange" },
+		{ "id": "clicks", "label": "⚡ Klicks", "pal": "orange" },
 		{ "id": "boosters", "label": "🚀 Booster", "pal": "blue" },
 		{ "id": "luck", "label": "🍀 Glück", "pal": "green" },
+		{ "id": "backgrounds", "label": "🌄 Hintergründe", "pal": "blue" },
+		{ "id": "sounds", "label": "🎵 Sounds", "pal": "orange" },
 		{ "id": "cosmetics", "label": "🎨 Kosmetik", "pal": "purple" }
 	]
 	for child in shop_tab_bar.get_children():
@@ -1936,9 +2279,11 @@ func _open_shop(initial_tab: String = "") -> void:
 	_populate_shop_tab(_current_shop_tab)
 	_update_hud()
 	UIKit.open_overlay(shop_overlay, shop_panel)
+	_sync_pet_companion_visibility()
 
 func _close_shop() -> void:
 	UIKit.close_overlay(shop_overlay, shop_panel)
+	_sync_pet_companion_visibility()
 	if _opened_from_main_menu:
 		_opened_from_main_menu = false
 		_open_main_menu()
@@ -2016,6 +2361,24 @@ func _create_shop_item_card(tab_id: String, item: Dictionary) -> PanelContainer:
 		UIKit.style_label(odds_lbl, 13, Color(0.62, 0.92, 1.0), 3)
 		info_vbox.add_child(odds_lbl)
 
+	# If Backgrounds tab, show visual landscape preview thumbnail
+	if tab_id == "backgrounds" and item.has("thumb") and ResourceLoader.exists(item["thumb"]):
+		var thumb_rect = TextureRect.new()
+		thumb_rect.custom_minimum_size = Vector2(148, 86)
+		thumb_rect.size = Vector2(148, 86)
+		thumb_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		thumb_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		thumb_rect.texture = load(item["thumb"])
+
+		var thumb_frame = PanelContainer.new()
+		thumb_frame.custom_minimum_size = Vector2(152, 90)
+		thumb_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		thumb_frame.add_child(thumb_rect)
+		var is_bg_active = (equipped_custom_bg == item.get("id", ""))
+		UIKit.style_panel(thumb_frame, "card_active" if is_bg_active else "inset", 12.0, 2.0)
+		hbox.add_child(thumb_frame)
+		hbox.move_child(thumb_frame, 0)
+
 	var action_btn = Button.new()
 	action_btn.custom_minimum_size = Vector2(158, 52)
 	action_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -2073,6 +2436,57 @@ func _create_shop_item_card(tab_id: String, item: Dictionary) -> PanelContainer:
 				action_btn.text = "%s Münzen" % _format_number(price)
 				UIKit.style_button(action_btn, "orange", 18, 18, 14.0, 6.0)
 				action_btn.pressed.connect(func(): _try_buy_luck_upgrade(item))
+		"backgrounds":
+			var owned = (item_id in owned_backgrounds) or (price == 0)
+			var is_active = (equipped_custom_bg == item_id)
+			if is_active:
+				action_btn.text = "AKTIV ✓"
+				action_btn.disabled = true
+				UIKit.style_button(action_btn, "green", 17, 18, 12.0, 6.0)
+				UIKit.style_panel(card, "card_active", 18.0, 14.0)
+			elif owned:
+				action_btn.text = "Auswählen"
+				UIKit.style_button(action_btn, "blue", 17, 18, 12.0, 6.0)
+				action_btn.pressed.connect(func():
+					_equip_background(item_id)
+					_on_shop_action_feedback("%s als Hintergrund aktiv!" % item["title"], true)
+				)
+			else:
+				action_btn.text = "%s Münzen" % _format_number(price)
+				UIKit.style_button(action_btn, "orange", 17, 18, 12.0, 6.0)
+				action_btn.pressed.connect(func(): _try_buy_background(item))
+		"sounds":
+			var owned = (item_id in owned_click_sounds) or (price == 0)
+			var is_active = (equipped_click_sound == item_id)
+
+			var preview_btn = Button.new()
+			preview_btn.custom_minimum_size = Vector2(144, 52)
+			preview_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			preview_btn.text = "🔊 Probehören"
+			UIKit.style_button(preview_btn, "navy", 16, 16, 12.0, 5.0)
+			preview_btn.pressed.connect(func():
+				_preview_click_sound(item_id)
+			)
+			hbox.add_child(preview_btn)
+			hbox.move_child(preview_btn, hbox.get_child_count() - 2)
+
+			if is_active:
+				action_btn.text = "AKTIV ✓"
+				action_btn.disabled = true
+				UIKit.style_button(action_btn, "green", 17, 18, 12.0, 6.0)
+				UIKit.style_panel(card, "card_active", 18.0, 14.0)
+			elif owned:
+				action_btn.text = "Auswählen"
+				UIKit.style_button(action_btn, "blue", 17, 18, 12.0, 6.0)
+				action_btn.pressed.connect(func():
+					equipped_click_sound = item_id
+					_play_tap_audio()
+					_on_shop_action_feedback("%s als Klick-Sound ausgewählt!" % item["title"], true)
+				)
+			else:
+				action_btn.text = "%s Münzen" % _format_number(price)
+				UIKit.style_button(action_btn, "orange", 17, 18, 12.0, 6.0)
+				action_btn.pressed.connect(func(): _try_buy_click_sound(item))
 		"cosmetics":
 			var owned = item_id in owned_cosmetics
 			var is_equipped = _is_cosmetic_equipped(item)
@@ -2152,6 +2566,47 @@ func _try_buy_cosmetic(item: Dictionary) -> void:
 	_play_buy_sound()
 	_on_shop_action_feedback("Kosmetik freigeschaltet & ausgerüstet: %s!" % item["title"], true)
 
+func _try_buy_background(item: Dictionary) -> void:
+	var price: int = int(item["price"])
+	if coins < price:
+		_on_shop_action_feedback("Nicht genug Münzen! Du benötigst %s Münzen." % _format_number(price), false)
+		return
+	coins -= price
+	var id: String = item["id"]
+	if not (id in owned_backgrounds):
+		owned_backgrounds.append(id)
+	_equip_background(id)
+	_play_buy_sound()
+	_on_shop_action_feedback("Hintergrund freigeschaltet: %s!" % item["title"], true)
+
+func _try_buy_click_sound(item: Dictionary) -> void:
+	var price: int = int(item["price"])
+	if coins < price:
+		_on_shop_action_feedback("Nicht genug Münzen! Du benötigst %s Münzen." % _format_number(price), false)
+		return
+	coins -= price
+	var id: String = item["id"]
+	if not (id in owned_click_sounds):
+		owned_click_sounds.append(id)
+	equipped_click_sound = id
+	_play_buy_sound()
+	_play_tap_audio()
+	_on_shop_action_feedback("Klick-Sound freigeschaltet: %s!" % item["title"], true)
+
+func _equip_background(id: String) -> void:
+	equipped_custom_bg = id
+	_apply_world_visuals(active_egg_id)
+	_save_progress()
+	_update_hud()
+	_populate_shop_tab(_current_shop_tab)
+
+func _get_background_by_id(id: String) -> Dictionary:
+	var bgs: Array = SHOP_CATALOG.get("backgrounds", [])
+	for b in bgs:
+		if b["id"] == id:
+			return b
+	return {}
+
 func _on_shop_action_feedback(msg: String, success: bool) -> void:
 	if shop_feedback_label:
 		shop_feedback_label.text = msg
@@ -2198,15 +2653,18 @@ func _apply_all_cosmetics() -> void:
 			"crack_ice": crack_overlay.set_crack_style("ice")
 			_: crack_overlay.set_crack_style(default_world_crack)
 	if atmosphere_overlay:
-		match equipped_bg_theme:
-			"bg_sunset":
-				atmosphere_overlay.color = Color(1.0, 0.45, 0.15, 0.22)
-				atmosphere_overlay.visible = true
-			"bg_night":
-				atmosphere_overlay.color = Color(0.05, 0.08, 0.28, 0.46)
-				atmosphere_overlay.visible = true
-			_:
-				atmosphere_overlay.visible = false
+		if equipped_custom_bg != "bg_world_default":
+			atmosphere_overlay.visible = false
+		else:
+			match equipped_bg_theme:
+				"bg_sunset":
+					atmosphere_overlay.color = Color(1.0, 0.45, 0.15, 0.22)
+					atmosphere_overlay.visible = true
+				"bg_night":
+					atmosphere_overlay.color = Color(0.05, 0.08, 0.28, 0.46)
+					atmosphere_overlay.visible = true
+				_:
+					atmosphere_overlay.visible = false
 
 func _get_egg_skin_color(skin_id: String) -> Color:
 	match skin_id:
@@ -2223,11 +2681,15 @@ func _spawn_pet_companion() -> void:
 
 	pet_companion = PetCompanion.new()
 	pet_companion.name = "PetCompanion"
+	pet_companion.z_index = 0
+	pet_companion.z_as_relative = false
 	# Position beside the main egg exactly where it was
 	pet_companion.position = Vector2(40, 480)
 	add_child(pet_companion)
+	if safe_container:
+		move_child(pet_companion, safe_container.get_index() + 1)
 
-	if not equipped_pet_id.is_empty():
+	if not equipped_pet_id.is_empty() and not _is_any_modal_open():
 		pet_companion.set_pet(equipped_pet_id)
 	else:
 		pet_companion.visible = false
@@ -2242,6 +2704,8 @@ func _build_pet_system_ui() -> void:
 	pet_modal_overlay.color = Color(0.02, 0.04, 0.1, 0.88)
 	pet_modal_overlay.visible = false
 	pet_modal_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	pet_modal_overlay.z_index = 40
+	pet_modal_overlay.z_as_relative = false
 	add_child(pet_modal_overlay)
 
 	pet_modal_panel = PanelContainer.new()
@@ -2367,32 +2831,42 @@ func _build_wheel_ui(parent: Control) -> void:
 	wheel_pointer.position = Vector2(355, 98)
 	wheel_stage_root.add_child(wheel_pointer)
 
-	# 3. Modern interactive UIKit Button & Ticket Counter directly inside the bottom slot of the right card
+	# 3. Interactive button placed directly over the illustrated gold & purple button
+	# Completely transparent (no gray box), letting the native illustrated art shine through!
 	pet_spin_button = Button.new()
 	pet_spin_button.name = "WheelSpinButton"
-	pet_spin_button.position = Vector2(706, 584)
-	pet_spin_button.size = Vector2(230, 52)
-	pet_spin_button.custom_minimum_size = Vector2(230, 52)
-	pet_spin_button.text = "🐾 KOSTENLOS DREHEN"
-	UIKit.style_button(pet_spin_button, "green", 18, 18, 16.0, 5.0)
+	pet_spin_button.position = Vector2(692, 596)
+	pet_spin_button.size = Vector2(262, 72)
+	pet_spin_button.custom_minimum_size = Vector2(262, 72)
+	pet_spin_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	pet_spin_button.pressed.connect(_on_wheel_spin_pressed)
+	var empty_sb = StyleBoxEmpty.new()
+	pet_spin_button.add_theme_stylebox_override("normal", empty_sb)
+	pet_spin_button.add_theme_stylebox_override("hover", empty_sb)
+	pet_spin_button.add_theme_stylebox_override("pressed", empty_sb)
+	pet_spin_button.add_theme_stylebox_override("disabled", empty_sb)
+	pet_spin_button.add_theme_stylebox_override("focus", empty_sb)
 	wheel_stage_root.add_child(pet_spin_button)
 
-	# 4. Clean Ticket Pill with crisp Fredoka font matching the rest of the game UI
-	var token_pill = PanelContainer.new()
-	token_pill.name = "TokenCountPill"
-	token_pill.position = Vector2(706, 644)
-	token_pill.size = Vector2(230, 38)
-	token_pill.custom_minimum_size = Vector2(230, 38)
-	UIKit.style_panel(token_pill, "inset", 12.0, 4.0)
-	wheel_stage_root.add_child(token_pill)
+	# Title label rendered directly inside the gold & purple button
+	pet_spin_title_label = Label.new()
+	pet_spin_title_label.name = "WheelSpinTitle"
+	pet_spin_title_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	pet_spin_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pet_spin_title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	pet_spin_title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pet_spin_button.add_child(pet_spin_title_label)
 
+	# 4. Ticket counter label rendered directly in the lower card slot underneath the gold & purple button
 	pet_token_label = Label.new()
 	pet_token_label.name = "TokenCountLabel"
+	pet_token_label.position = Vector2(692, 672)
+	pet_token_label.size = Vector2(262, 44)
+	pet_token_label.custom_minimum_size = Vector2(262, 44)
 	pet_token_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pet_token_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	UIKit.style_label(pet_token_label, 15, Color(1.0, 0.94, 0.5), 3, Color(0.04, 0.04, 0.18), false)
-	token_pill.add_child(pet_token_label)
+	pet_token_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wheel_stage_root.add_child(pet_token_label)
 
 	# 5. Epic Pet Reveal Overlay with Dynamic God-Rays, Shockwaves, Large Showcase & Animations
 	wheel_reveal_overlay = ColorRect.new()
@@ -2569,27 +3043,41 @@ func _update_wheel_hud() -> void:
 	if pet_spin_button:
 		pet_spin_button.disabled = not can_spin
 		pet_spin_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if can_spin else Control.CURSOR_FORBIDDEN
-		if is_wheel_spinning:
-			pet_spin_button.text = "⏳ DREHT SICH..."
-			UIKit.style_button(pet_spin_button, "blue", 17, 17, 16.0, 5.0)
-		elif can_spin:
-			pet_spin_button.text = "🐾 KOSTENLOS DREHEN"
-			UIKit.style_button(pet_spin_button, "green", 17, 17, 16.0, 5.0)
-		else:
-			pet_spin_button.text = "🐾 KEINE TICKETS"
-			UIKit.style_button(pet_spin_button, "orange", 17, 17, 16.0, 5.0)
-			pet_spin_button.modulate = Color(0.75, 0.78, 0.88, 0.70)
+		pet_spin_button.text = ""
 
-	if pet_token_label:
-		if pet_tokens == 1:
-			pet_token_label.text = "🎟️ 1 Dreh verfügbar"
-			pet_token_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.45))
-		elif pet_tokens > 1:
-			pet_token_label.text = "🎟️ %d Drehs verfügbar" % pet_tokens
-			pet_token_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.45))
+		# Keep button background 100% transparent to showcase the illustrated gold & purple artwork
+		var empty_sb = StyleBoxEmpty.new()
+		pet_spin_button.add_theme_stylebox_override("normal", empty_sb)
+		pet_spin_button.add_theme_stylebox_override("hover", empty_sb)
+		pet_spin_button.add_theme_stylebox_override("pressed", empty_sb)
+		pet_spin_button.add_theme_stylebox_override("disabled", empty_sb)
+		pet_spin_button.add_theme_stylebox_override("focus", empty_sb)
+
+		if is_wheel_spinning:
+			if pet_spin_title_label:
+				pet_spin_title_label.text = "⏳ DREHT SICH..."
+				UIKit.style_label(pet_spin_title_label, 20, Color(0.65, 0.92, 1.0), 5, Color(0.04, 0.08, 0.22))
+			if pet_token_label:
+				pet_token_label.text = "✨ Viel Glück!"
+				UIKit.style_label(pet_token_label, 14, Color(0.85, 0.95, 1.0), 3, Color(0.04, 0.08, 0.22), false)
+			pet_spin_button.modulate = Color.WHITE
+		elif can_spin:
+			if pet_spin_title_label:
+				pet_spin_title_label.text = "🐾 KOSTENLOS DREHEN"
+				UIKit.style_label(pet_spin_title_label, 20, Color.WHITE, 5, Color(0.14, 0.04, 0.28))
+			if pet_token_label:
+				var t_str = "🎟️ %d Dreh verfügbar" % pet_tokens if pet_tokens == 1 else "🎟️ %d Drehs verfügbar" % pet_tokens
+				pet_token_label.text = t_str
+				UIKit.style_label(pet_token_label, 14, Color(1.0, 0.94, 0.45), 3, Color(0.08, 0.06, 0.01), false)
+			pet_spin_button.modulate = Color.WHITE
 		else:
-			pet_token_label.text = "🎟️ 0 Drehs (durch Eier)"
-			pet_token_label.add_theme_color_override("font_color", Color(0.72, 0.78, 0.90))
+			if pet_spin_title_label:
+				pet_spin_title_label.text = "🐾 KEINE TICKETS"
+				UIKit.style_label(pet_spin_title_label, 19, Color(0.82, 0.86, 0.96), 4, Color(0.08, 0.05, 0.18))
+			if pet_token_label:
+				pet_token_label.text = "🎟️ 0 Drehs (durch Eier öffnen)"
+				UIKit.style_label(pet_token_label, 13, Color(0.70, 0.78, 0.92), 3, Color(0.04, 0.05, 0.14), false)
+			pet_spin_button.modulate = Color.WHITE
 
 func _on_wheel_spin_pressed() -> void:
 	if is_wheel_spinning or pet_tokens <= 0:
@@ -2812,9 +3300,11 @@ func _open_pet_modal() -> void:
 		settings_overlay.visible = false
 	_switch_pet_tab("wheel")
 	UIKit.open_overlay(pet_modal_overlay, pet_modal_panel)
+	_sync_pet_companion_visibility()
 
 func _close_pet_modal() -> void:
 	UIKit.close_overlay(pet_modal_overlay, pet_modal_panel)
+	_sync_pet_companion_visibility()
 	if _opened_from_main_menu:
 		_opened_from_main_menu = false
 		_open_main_menu()
@@ -2831,6 +3321,8 @@ func _build_egg_selection_ui() -> void:
 	egg_select_overlay.color = Color(0.03, 0.05, 0.12, 0.86)
 	egg_select_overlay.visible = false
 	egg_select_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	egg_select_overlay.z_index = 40
+	egg_select_overlay.z_as_relative = false
 	add_child(egg_select_overlay)
 
 	egg_select_panel = PanelContainer.new()
@@ -2893,9 +3385,11 @@ func _open_egg_select() -> void:
 	_save_progress()
 	_update_hud()
 	UIKit.open_overlay(egg_select_overlay, egg_select_panel)
+	_sync_pet_companion_visibility()
 
 func _close_egg_select() -> void:
 	UIKit.close_overlay(egg_select_overlay, egg_select_panel)
+	_sync_pet_companion_visibility()
 	if _opened_from_main_menu:
 		_opened_from_main_menu = false
 		_open_main_menu()
@@ -3022,7 +3516,7 @@ func _build_collection_filter_bar() -> void:
 	col_vbox.move_child(collection_filter_bar, 2)
 
 	var filters = [
-		{ "id": "all", "label": "Alle (18)", "pal": "blue" },
+		{ "id": "all", "label": "Alle (%d)" % SLIME_CATALOG.size(), "pal": "blue" },
 		{ "id": "nature", "label": "🌿 Nature (6)", "pal": "green" },
 		{ "id": "crystal", "label": "💎 Crystal (6)", "pal": "blue" },
 		{ "id": "cosmic", "label": "🌌 Cosmic (6)", "pal": "purple" }
@@ -3057,9 +3551,11 @@ func _open_collection() -> void:
 	_save_progress()
 	_update_hud()
 	UIKit.open_overlay(collection_overlay, collection_panel)
+	_sync_pet_companion_visibility()
 
 func _close_collection() -> void:
 	UIKit.close_overlay(collection_overlay, collection_panel)
+	_sync_pet_companion_visibility()
 	if _opened_from_main_menu:
 		_opened_from_main_menu = false
 		_open_main_menu()
@@ -3086,7 +3582,7 @@ func _populate_collection_grid() -> void:
 	var active_chances: Dictionary = LUCK_TABLES.get(active_luck_upgrade, LUCK_TABLES["base"])["chances"]
 
 	for slime in SLIME_CATALOG:
-		if _collection_filter_egg != "all" and slime["egg_id"] != _collection_filter_egg:
+		if _collection_filter_egg != "all" and slime["egg_id"] != _collection_filter_egg and slime["egg_id"] != "all":
 			continue
 		var sid: String = slime["id"]
 		var count: int = int(slime_counts.get(sid, 0))
@@ -3109,7 +3605,7 @@ func _populate_collection_grid() -> void:
 
 		var r_lbl = Label.new()
 		var r_tier: String = slime.get("rarity", "common")
-		var pct: float = float(active_chances.get(r_tier, slime["base_chance"]))
+		var pct: float = float(active_chances.get(r_tier, slime.get("base_chance", 0.5)))
 		r_lbl.text = "★ %s (%s%%)" % [slime["rarity_name"], _format_pct(pct)]
 		UIKit.style_label(r_lbl, 14, r_col, 4)
 		top_hbox.add_child(r_lbl)
@@ -3121,8 +3617,9 @@ func _populate_collection_grid() -> void:
 			top_hbox.add_child(new_lbl)
 
 		var egg_origin_lbl = Label.new()
-		var egg_badge_prefix = "🌿 " if slime["egg_id"] == "nature" else ("💎 " if slime["egg_id"] == "crystal" else "🌌 ")
-		egg_origin_lbl.text = egg_badge_prefix + str(slime.get("egg_name", "Nature Egg"))
+		var egg_badge_prefix = "✨ " if slime["egg_id"] == "all" else ("🌿 " if slime["egg_id"] == "nature" else ("💎 " if slime["egg_id"] == "crystal" else "🌌 "))
+		var egg_origin_name = "Alle Eier" if slime["egg_id"] == "all" else str(slime.get("egg_name", "Nature Egg"))
+		egg_origin_lbl.text = egg_badge_prefix + egg_origin_name
 		egg_origin_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		UIKit.style_label(egg_origin_lbl, 12, Color(0.75, 0.88, 1.0), 3, Color(0.04, 0.07, 0.16), false)
 		vbox.add_child(egg_origin_lbl)
@@ -3262,18 +3759,41 @@ func _format_pct(val: float) -> String:
 		return str(int(round(val)))
 	return ("%.1f" % val).replace(".", ",")
 
+func _get_click_sound_stream(sound_id: String) -> AudioStream:
+	if _click_sound_streams.has(sound_id):
+		return _click_sound_streams[sound_id]
+	var path = "res://assets/audio/%s.wav" % sound_id
+	if ResourceLoader.exists(path):
+		var st = load(path)
+		_click_sound_streams[sound_id] = st
+		return st
+	if tap_player and tap_player.stream:
+		return tap_player.stream
+	return null
+
 func _play_tap_audio() -> void:
-	if tap_player and not AudioServer.is_bus_mute(0) and setting_sfx_volume > 0.01:
-		tap_player.pitch_scale = _rng.randf_range(0.95, 1.05)
+	if tap_player and not AudioServer.is_bus_mute(0) and not setting_audio_muted and setting_sfx_volume > 0.01:
+		var st = _get_click_sound_stream(equipped_click_sound)
+		if st:
+			tap_player.stream = st
+		tap_player.pitch_scale = _rng.randf_range(0.96, 1.04)
 		tap_player.play()
 
+func _preview_click_sound(sound_id: String) -> void:
+	if preview_player and not AudioServer.is_bus_mute(0) and not setting_audio_muted and setting_sfx_volume > 0.01:
+		var st = _get_click_sound_stream(sound_id)
+		if st:
+			preview_player.stream = st
+			preview_player.pitch_scale = 1.0
+			preview_player.play()
+
 func _play_crack_sound() -> void:
-	if crack_player and not AudioServer.is_bus_mute(0) and setting_sfx_volume > 0.01:
+	if crack_player and not AudioServer.is_bus_mute(0) and not setting_audio_muted and setting_sfx_volume > 0.01:
 		crack_player.pitch_scale = _rng.randf_range(0.95, 1.05)
 		crack_player.play()
 
 func _play_buy_sound() -> void:
-	if buy_player and not AudioServer.is_bus_mute(0) and setting_sfx_volume > 0.01:
+	if buy_player and not AudioServer.is_bus_mute(0) and not setting_audio_muted and setting_sfx_volume > 0.01:
 		buy_player.pitch_scale = _rng.randf_range(0.98, 1.04)
 		buy_player.play()
 
@@ -3303,6 +3823,10 @@ func _serialize_save() -> String:
 		"b_2x": snappedf(booster_2x_time, 0.1),
 		"b_auto": snappedf(booster_auto_time, 0.1),
 		"b_5x": snappedf(booster_5x_time, 0.1),
+		"owned_bgs": owned_backgrounds,
+		"eq_custom_bg": equipped_custom_bg,
+		"owned_sounds": owned_click_sounds,
+		"eq_sound": equipped_click_sound,
 		"cosmetics": owned_cosmetics,
 		"eq_egg": equipped_egg_skin,
 		"eq_crack": equipped_crack_style,
@@ -3311,7 +3835,9 @@ func _serialize_save() -> String:
 		"eq_aura": equipped_reveal_aura,
 		"slimes": slime_counts,
 		"unseen": slime_unseen,
-		"sfx_vol": setting_sfx_volume,
+		"sfx_vol": snappedf(setting_sfx_volume, 0.01),
+		"music_vol": snappedf(setting_music_volume, 0.01),
+		"audio_muted": setting_audio_muted,
 		"part_on": setting_particles_enabled,
 		"red_shake": setting_reduced_shake,
 		"game_zoom": snappedf(setting_game_zoom, 0.01),
@@ -3413,6 +3939,13 @@ func _apply_loaded_json(json_str: String) -> void:
 	booster_auto_time = max(0.0, float(d.get("b_auto", 0.0)))
 	booster_5x_time = max(0.0, float(d.get("b_5x", 0.0)))
 
+	if d.has("owned_bgs") and typeof(d["owned_bgs"]) == TYPE_ARRAY:
+		for item in d["owned_bgs"]:
+			var bg_id = str(item)
+			if not (bg_id in owned_backgrounds):
+				owned_backgrounds.append(bg_id)
+	equipped_custom_bg = str(d.get("eq_custom_bg", "bg_world_default"))
+
 	if d.has("cosmetics") and typeof(d["cosmetics"]) == TYPE_ARRAY:
 		for item in d["cosmetics"]:
 			var cid = str(item)
@@ -3460,13 +3993,22 @@ func _apply_loaded_json(json_str: String) -> void:
 		pet_companion.set_pet(equipped_pet_id)
 	_update_wheel_hud()
 
-	setting_sfx_volume = clampf(float(d.get("sfx_vol", 1.0)), 0.0, 1.0)
+	setting_sfx_volume = clampf(float(d.get("sfx_vol", 0.80)), 0.0, 1.0)
+	setting_music_volume = clampf(float(d.get("music_vol", 0.70)), 0.0, 1.0)
+	setting_audio_muted = bool(d.get("audio_muted", false))
+	if d.has("owned_sounds") and typeof(d["owned_sounds"]) == TYPE_ARRAY:
+		for item in d["owned_sounds"]:
+			var snd_id = str(item)
+			if not (snd_id in owned_click_sounds):
+				owned_click_sounds.append(snd_id)
+	equipped_click_sound = str(d.get("eq_sound", "click_crisp"))
 	setting_particles_enabled = bool(d.get("part_on", true))
 	setting_reduced_shake = bool(d.get("red_shake", false))
 	setting_game_zoom = clampf(float(d.get("game_zoom", 1.0)), 0.70, 1.50)
 	_apply_game_zoom()
 
 	_apply_user_settings()
+	_apply_audio_state(_yt_audio_allowed)
 	_apply_world_visuals(active_egg_id, false)
 	_apply_all_cosmetics()
 	if crack_overlay:
@@ -3506,10 +4048,308 @@ func _on_yt_audio_changed(is_enabled: bool) -> void:
 	_apply_audio_state(is_enabled)
 
 func _apply_audio_state(is_enabled: bool) -> void:
-	var should_mute: bool = (not is_enabled) or (setting_sfx_volume <= 0.01)
-	AudioServer.set_bus_mute(0, should_mute)
-	if not should_mute:
-		AudioServer.set_bus_volume_db(0, linear_to_db(clampf(setting_sfx_volume, 0.05, 1.0)))
+	var master_mute: bool = (not is_enabled) or setting_audio_muted
+	AudioServer.set_bus_mute(0, master_mute)
+
+	# Bus 1: Music
+	if AudioServer.bus_count > 1:
+		var music_mute: bool = master_mute or (setting_music_volume <= 0.01)
+		AudioServer.set_bus_mute(1, music_mute)
+		if not music_mute:
+			var m_db = linear_to_db(clampf(setting_music_volume, 0.01, 1.0))
+			AudioServer.set_bus_volume_db(1, m_db)
+
+	# Bus 2: SFX
+	if AudioServer.bus_count > 2:
+		var sfx_mute: bool = master_mute or (setting_sfx_volume <= 0.01)
+		AudioServer.set_bus_mute(2, sfx_mute)
+		if not sfx_mute:
+			var s_db = linear_to_db(clampf(setting_sfx_volume, 0.01, 1.0))
+			AudioServer.set_bus_volume_db(2, s_db)
+
+	_update_sound_button_icon()
+
+func _setup_audio_system() -> void:
+	if AudioServer.bus_count < 2:
+		AudioServer.add_bus(1)
+		AudioServer.set_bus_name(1, "Music")
+		AudioServer.set_bus_send(1, "Master")
+	if AudioServer.bus_count < 3:
+		AudioServer.add_bus(2)
+		AudioServer.set_bus_name(2, "SFX")
+		AudioServer.set_bus_send(2, "Master")
+
+	if not bgm_player:
+		bgm_player = AudioStreamPlayer.new()
+		bgm_player.name = "BgmPlayer"
+		bgm_player.bus = "Music"
+		if ResourceLoader.exists("res://assets/audio/bgm_cozy_loop.wav"):
+			var st = load("res://assets/audio/bgm_cozy_loop.wav")
+			if st is AudioStreamWAV:
+				st.loop_mode = AudioStreamWAV.LOOP_FORWARD
+			bgm_player.stream = st
+		add_child(bgm_player)
+
+	if not preview_player:
+		preview_player = AudioStreamPlayer.new()
+		preview_player.name = "PreviewPlayer"
+		preview_player.bus = "SFX"
+		add_child(preview_player)
+
+	if tap_player:
+		tap_player.bus = "SFX"
+	if crack_player:
+		crack_player.bus = "SFX"
+	if shatter_player:
+		shatter_player.bus = "SFX"
+	if buy_player:
+		buy_player.bus = "SFX"
+
+	_apply_audio_state(_yt_audio_allowed)
+
+func _start_bgm_if_needed() -> void:
+	if bgm_player and not bgm_player.playing and bgm_player.stream != null:
+		bgm_player.play()
+
+func _get_sound_icon_and_state() -> Dictionary:
+	if setting_audio_muted or not _yt_audio_allowed or (setting_music_volume <= 0.01 and setting_sfx_volume <= 0.01):
+		return { "icon": "🔇", "label": "Stumm", "state": "mute" }
+	var avg_vol = (setting_music_volume + setting_sfx_volume) * 0.5
+	if avg_vol <= 0.40:
+		return { "icon": "🔉", "label": "Leise", "state": "low" }
+	return { "icon": "🔊", "label": "Ton An", "state": "normal" }
+
+func _update_sound_button_icon() -> void:
+	var info = _get_sound_icon_and_state()
+	if sound_hud_btn:
+		sound_hud_btn.text = info["icon"]
+		sound_hud_btn.tooltip_text = "Sound & Musik (%s)" % info["label"]
+
+func _setup_sound_hud_button() -> void:
+	if top_right_bar and not sound_hud_btn:
+		sound_hud_btn = Button.new()
+		sound_hud_btn.name = "SoundButton"
+		sound_hud_btn.custom_minimum_size = Vector2(48, 48)
+		sound_hud_btn.text = "🔊"
+		UIKit.style_button(sound_hud_btn, "navy", 18, 22, 10.0, 8.0)
+		sound_hud_btn.pressed.connect(func():
+			_open_sound_modal()
+		)
+		top_right_bar.add_child(sound_hud_btn)
+		var s_idx = settings_btn.get_index() if settings_btn else -1
+		if s_idx >= 0:
+			top_right_bar.move_child(sound_hud_btn, s_idx)
+	_update_sound_button_icon()
+
+func _build_sound_modal_ui() -> void:
+	if sound_modal_overlay:
+		return
+
+	sound_modal_overlay = ColorRect.new()
+	sound_modal_overlay.name = "SoundModalOverlay"
+	sound_modal_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	sound_modal_overlay.color = Color(0.03, 0.05, 0.12, 0.86)
+	sound_modal_overlay.visible = false
+	sound_modal_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	sound_modal_overlay.z_index = 40
+	sound_modal_overlay.z_as_relative = false
+	add_child(sound_modal_overlay)
+
+	sound_modal_panel = PanelContainer.new()
+	sound_modal_panel.name = "SoundModalPanel"
+	sound_modal_panel.set_anchors_preset(Control.PRESET_CENTER)
+	sound_modal_panel.offset_left = -270.0
+	sound_modal_panel.offset_top = -245.0
+	sound_modal_panel.offset_right = 270.0
+	sound_modal_panel.offset_bottom = 245.0
+	UIKit.style_panel(sound_modal_panel, "modal", 24.0, 20.0)
+	sound_modal_overlay.add_child(sound_modal_panel)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 14)
+	sound_modal_panel.add_child(vbox)
+
+	# Header
+	var header = HBoxContainer.new()
+	vbox.add_child(header)
+
+	var title = Label.new()
+	title.text = "🎵 AUDIO & MUSIK"
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	UIKit.style_label(title, 22, Color(1.0, 0.90, 0.35), 6)
+	header.add_child(title)
+
+	var close_btn = Button.new()
+	close_btn.custom_minimum_size = Vector2(42, 42)
+	close_btn.text = "✕"
+	UIKit.style_button(close_btn, "red", 18, 14, 10.0, 4.0)
+	close_btn.pressed.connect(_close_sound_modal)
+	header.add_child(close_btn)
+
+	# 1. Music Volume Slider Card
+	var music_card = PanelContainer.new()
+	UIKit.style_panel(music_card, "card", 16.0, 12.0)
+	vbox.add_child(music_card)
+
+	var m_vbox = VBoxContainer.new()
+	m_vbox.add_theme_constant_override("separation", 8)
+	music_card.add_child(m_vbox)
+
+	var m_header = HBoxContainer.new()
+	m_vbox.add_child(m_header)
+
+	var m_lbl = Label.new()
+	m_lbl.text = "🎼 Hintergrundmusik"
+	m_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	UIKit.style_label(m_lbl, 17, Color.WHITE, 4)
+	m_header.add_child(m_lbl)
+
+	sound_music_pct_lbl = Label.new()
+	sound_music_pct_lbl.text = "%d %%" % int(round(setting_music_volume * 100.0))
+	UIKit.style_label(sound_music_pct_lbl, 18, Color("#ffe047"), 5)
+	m_header.add_child(sound_music_pct_lbl)
+
+	var m_slider_hbox = HBoxContainer.new()
+	m_slider_hbox.add_theme_constant_override("separation", 10)
+	m_vbox.add_child(m_slider_hbox)
+
+	var m_min_lbl = Label.new()
+	m_min_lbl.text = "0%"
+	UIKit.style_label(m_min_lbl, 13, Color(0.75, 0.84, 0.95), 3)
+	m_slider_hbox.add_child(m_min_lbl)
+
+	sound_music_slider = HSlider.new()
+	sound_music_slider.min_value = 0.0
+	sound_music_slider.max_value = 1.0
+	sound_music_slider.step = 0.01
+	sound_music_slider.value = setting_music_volume
+	sound_music_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sound_music_slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	UIKit.style_slider(sound_music_slider)
+	m_slider_hbox.add_child(sound_music_slider)
+
+	var m_max_lbl = Label.new()
+	m_max_lbl.text = "100%"
+	UIKit.style_label(m_max_lbl, 13, Color(0.75, 0.84, 0.95), 3)
+	m_slider_hbox.add_child(m_max_lbl)
+
+	sound_music_slider.value_changed.connect(func(new_val: float):
+		setting_music_volume = clampf(new_val, 0.0, 1.0)
+		sound_music_pct_lbl.text = "%d %%" % int(round(setting_music_volume * 100.0))
+		_apply_audio_state(_yt_audio_allowed)
+		_save_progress()
+	)
+
+	# 2. SFX Volume Slider Card
+	var sfx_card = PanelContainer.new()
+	UIKit.style_panel(sfx_card, "card", 16.0, 12.0)
+	vbox.add_child(sfx_card)
+
+	var s_vbox = VBoxContainer.new()
+	s_vbox.add_theme_constant_override("separation", 8)
+	sfx_card.add_child(s_vbox)
+
+	var s_header = HBoxContainer.new()
+	s_vbox.add_child(s_header)
+
+	var s_lbl = Label.new()
+	s_lbl.text = "🔊 Soundeffekte & Klicks"
+	s_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	UIKit.style_label(s_lbl, 17, Color.WHITE, 4)
+	s_header.add_child(s_lbl)
+
+	sound_sfx_pct_lbl = Label.new()
+	sound_sfx_pct_lbl.text = "%d %%" % int(round(setting_sfx_volume * 100.0))
+	UIKit.style_label(sound_sfx_pct_lbl, 18, Color("#ffe047"), 5)
+	s_header.add_child(sound_sfx_pct_lbl)
+
+	var s_slider_hbox = HBoxContainer.new()
+	s_slider_hbox.add_theme_constant_override("separation", 10)
+	s_vbox.add_child(s_slider_hbox)
+
+	var s_min_lbl = Label.new()
+	s_min_lbl.text = "0%"
+	UIKit.style_label(s_min_lbl, 13, Color(0.75, 0.84, 0.95), 3)
+	s_slider_hbox.add_child(s_min_lbl)
+
+	sound_sfx_slider = HSlider.new()
+	sound_sfx_slider.min_value = 0.0
+	sound_sfx_slider.max_value = 1.0
+	sound_sfx_slider.step = 0.01
+	sound_sfx_slider.value = setting_sfx_volume
+	sound_sfx_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sound_sfx_slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	UIKit.style_slider(sound_sfx_slider)
+	s_slider_hbox.add_child(sound_sfx_slider)
+
+	var s_max_lbl = Label.new()
+	s_max_lbl.text = "100%"
+	UIKit.style_label(s_max_lbl, 13, Color(0.75, 0.84, 0.95), 3)
+	s_slider_hbox.add_child(s_max_lbl)
+
+	sound_sfx_slider.value_changed.connect(func(new_val: float):
+		setting_sfx_volume = clampf(new_val, 0.0, 1.0)
+		sound_sfx_pct_lbl.text = "%d %%" % int(round(setting_sfx_volume * 100.0))
+		_apply_audio_state(_yt_audio_allowed)
+		_save_progress()
+	)
+
+	# 3. Actions Row: Mute Toggle + Link to Click Sounds Shop Tab
+	var act_hbox = HBoxContainer.new()
+	act_hbox.add_theme_constant_override("separation", 10)
+	vbox.add_child(act_hbox)
+
+	sound_mute_toggle_btn = Button.new()
+	sound_mute_toggle_btn.custom_minimum_size = Vector2(160, 44)
+	sound_mute_toggle_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_update_sound_mute_button_ui()
+	sound_mute_toggle_btn.pressed.connect(func():
+		setting_audio_muted = not setting_audio_muted
+		_update_sound_mute_button_ui()
+		_apply_audio_state(_yt_audio_allowed)
+		_save_progress()
+	)
+	act_hbox.add_child(sound_mute_toggle_btn)
+
+	var sound_shop_link_btn = Button.new()
+	sound_shop_link_btn.custom_minimum_size = Vector2(160, 44)
+	sound_shop_link_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sound_shop_link_btn.text = "🛒 Klick-Sounds"
+	UIKit.style_button(sound_shop_link_btn, "purple", 16, 16, 12.0, 5.0)
+	sound_shop_link_btn.pressed.connect(func():
+		_close_sound_modal()
+		_open_shop("sounds")
+	)
+	act_hbox.add_child(sound_shop_link_btn)
+
+func _update_sound_mute_button_ui() -> void:
+	if not sound_mute_toggle_btn:
+		return
+	if setting_audio_muted:
+		sound_mute_toggle_btn.text = "🔇 Stumm (Aufheben)"
+		UIKit.style_button(sound_mute_toggle_btn, "orange", 15, 16, 12.0, 5.0)
+	else:
+		sound_mute_toggle_btn.text = "🔊 Alle Töne stumm"
+		UIKit.style_button(sound_mute_toggle_btn, "blue", 15, 16, 12.0, 5.0)
+
+func _open_sound_modal() -> void:
+	_build_sound_modal_ui()
+	if sound_music_slider:
+		sound_music_slider.value = setting_music_volume
+	if sound_music_pct_lbl:
+		sound_music_pct_lbl.text = "%d %%" % int(round(setting_music_volume * 100.0))
+	if sound_sfx_slider:
+		sound_sfx_slider.value = setting_sfx_volume
+	if sound_sfx_pct_lbl:
+		sound_sfx_pct_lbl.text = "%d %%" % int(round(setting_sfx_volume * 100.0))
+	_update_sound_mute_button_ui()
+	UIKit.open_overlay(sound_modal_overlay, sound_modal_panel)
+	_sync_pet_companion_visibility()
+
+func _close_sound_modal() -> void:
+	if sound_modal_overlay:
+		UIKit.close_overlay(sound_modal_overlay, sound_modal_panel)
+	_sync_pet_companion_visibility()
 
 func _on_resume_button_pressed() -> void:
 	if get_tree().paused:

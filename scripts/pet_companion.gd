@@ -54,7 +54,11 @@ func _ready() -> void:
 	UIKit.style_label(_name_label, 13, Color(1.0, 0.95, 0.55), 3, Color(0.04, 0.08, 0.16), false)
 	_name_bubble.add_child(_name_label)
 
-	_start_floating_animation()
+	if not current_pet_id.is_empty():
+		set_pet(current_pet_id)
+		# Start visible only if not suppressed by parent overlay
+	else:
+		_start_floating_animation()
 
 func set_pet(pet_id: String) -> void:
 	current_pet_id = pet_id
@@ -67,13 +71,19 @@ func set_pet(pet_id: String) -> void:
 		visible = false
 		return
 
-	visible = true
-	if ResourceLoader.exists(_pet_data["path"]):
+	# Only make visible if parent isn't suppressing visibility (e.g. inside modals)
+	var parent_node = get_parent()
+	if parent_node and parent_node.has_method("_is_any_modal_open"):
+		visible = not bool(parent_node._is_any_modal_open())
+	else:
+		visible = true
+	if _sprite and ResourceLoader.exists(_pet_data["path"]):
 		_sprite.texture = load(_pet_data["path"])
 
-	_name_label.text = _pet_data["name"]
-	var r_col: Color = _pet_data.get("color", Color.WHITE)
-	_name_label.add_theme_color_override("font_color", r_col.lightened(0.2))
+	if _name_label:
+		_name_label.text = _pet_data["name"]
+		var r_col: Color = _pet_data.get("color", Color.WHITE)
+		_name_label.add_theme_color_override("font_color", r_col.lightened(0.2))
 
 	_start_floating_animation()
 

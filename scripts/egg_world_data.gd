@@ -68,7 +68,7 @@ const CLICK_TARGET_TABLE: Array[Dictionary] = [
 	{ "target": 10000, "weight": 45 }
 ]
 
-const RARITY_ORDER: Array[String] = ["common", "uncommon", "rare", "epic", "legendary", "mythic"]
+const RARITY_ORDER: Array[String] = ["common", "uncommon", "rare", "epic", "legendary", "mythic", "secret"]
 
 const RARITY_META: Dictionary = {
 	"common":    { "name": "COMMON",    "base_chance": 70.0, "color": Color(0.82, 0.88, 0.96) },
@@ -76,7 +76,8 @@ const RARITY_META: Dictionary = {
 	"rare":      { "name": "RARE",      "base_chance": 7.0,  "color": Color(0.24, 0.80, 1.00) },
 	"epic":      { "name": "EPIC",      "base_chance": 2.0,  "color": Color(0.80, 0.36, 1.00) },
 	"legendary": { "name": "LEGENDARY", "base_chance": 0.8,  "color": Color(1.00, 0.84, 0.16) },
-	"mythic":    { "name": "MYTHIC",    "base_chance": 0.2,  "color": Color(0.95, 0.26, 0.92) }
+	"mythic":    { "name": "MYTHIC",    "base_chance": 0.2,  "color": Color(0.95, 0.26, 0.92) },
+	"secret":    { "name": "???",       "base_chance": 0.5,  "color": Color(1.00, 0.45, 0.95) }
 }
 
 ## Section 5: 18 Unique Slimes (6 per Egg)
@@ -301,6 +302,20 @@ const SLIME_CATALOG: Array[Dictionary] = [
 		"color": Color(0.95, 0.26, 0.92),
 		"desc": "Ultimativer kosmischer Singularitäts-Slime mit Ereignishorizont-Ring und leuchtenden Augen!",
 		"path": "res://assets/slimes/cosmic_mythic.png"
+	},
+	# --- Secret Mythical Slime (All Eggs) ---
+	{
+		"id": "secret_slime",
+		"egg_id": "all",
+		"egg_name": "Alle Eier",
+		"rarity": "secret",
+		"rarity_name": "???",
+		"name": "??? Slime",
+		"base_chance": 0.5,
+		"reward_coins": 150000,
+		"color": Color(1.0, 0.45, 0.95),
+		"desc": "Ein sagenumwobener, gottgleicher ???-Slime mit kosmischer Regenbogen-Aura, schwebender Krone und funkelnden Sternen!",
+		"path": "res://assets/slimes/secret_slime.png"
 	}
 ]
 
@@ -323,9 +338,15 @@ static func is_valid_click_target(val: int) -> bool:
 static func get_slimes_for_egg(egg_id: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for s in SLIME_CATALOG:
-		if s["egg_id"] == egg_id:
+		if s["egg_id"] == egg_id or s["egg_id"] == "all":
 			out.append(s)
 	return out
+
+static func get_slime_by_id(id: String) -> Dictionary:
+	for s in SLIME_CATALOG:
+		if s["id"] == id:
+			return s
+	return {}
 
 static func get_slime_by_egg_and_rarity(egg_id: String, rarity_id: String) -> Dictionary:
 	for s in SLIME_CATALOG:

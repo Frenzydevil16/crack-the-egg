@@ -154,12 +154,6 @@ func _draw() -> void:
 			shim_sb.set_corner_radius_all(8)
 			draw_style_box(shim_sb, shim_rect)
 
-		# Leading edge glow orb
-		if ratio > 0.02 and ratio < 0.995:
-			var tip_pos := Vector2(fill_rect.end.x - 6.0, fill_rect.get_center().y)
-			draw_circle(tip_pos, track_rect.size.y * 0.42, Color(1.0, 1.0, 1.0, 0.35))
-			draw_circle(tip_pos, track_rect.size.y * 0.22, Color(1.0, 1.0, 1.0, 0.85))
-
 	# 5. Milestone markers at 50%, 75%, 90%
 	var milestones: Array[float] = [0.50, 0.75, 0.90]
 	for m in milestones:

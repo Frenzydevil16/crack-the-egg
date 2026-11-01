@@ -320,6 +320,28 @@ static func close_overlay(overlay: Control, panel: Control = null) -> void:
 			panel.scale = Vector2.ONE
 	)
 
+static var _slider_grabber_tex: ImageTexture = null
+
+static func _get_slider_grabber() -> ImageTexture:
+	if _slider_grabber_tex != null:
+		return _slider_grabber_tex
+	var sz := 22
+	var img := Image.create(sz, sz, false, Image.FORMAT_RGBA8)
+	var center := Vector2(sz * 0.5, sz * 0.5)
+	var radius := (sz * 0.5) - 1.5
+	for y in range(sz):
+		for x in range(sz):
+			var dist := center.distance_to(Vector2(x + 0.5, y + 0.5))
+			if dist <= radius - 1.0:
+				img.set_pixel(x, y, Color(1.0, 1.0, 1.0, 1.0))
+			elif dist <= radius:
+				var a := 1.0 - (dist - (radius - 1.0))
+				img.set_pixel(x, y, Color(1.0, 1.0, 1.0, a))
+			else:
+				img.set_pixel(x, y, Color(0.0, 0.0, 0.0, 0.0))
+	_slider_grabber_tex = ImageTexture.create_from_image(img)
+	return _slider_grabber_tex
+
 ## Styles an HSlider with modern rounded glassmorphism track and glowing fill.
 static func style_slider(slider: HSlider) -> void:
 	if slider == null:
@@ -348,3 +370,8 @@ static func style_slider(slider: HSlider) -> void:
 	slider.add_theme_stylebox_override("slider", track)
 	slider.add_theme_stylebox_override("grabber_area", fill)
 	slider.add_theme_stylebox_override("grabber_area_highlight", fill)
+
+	var grabber_tex := _get_slider_grabber()
+	slider.add_theme_icon_override("grabber", grabber_tex)
+	slider.add_theme_icon_override("grabber_highlight", grabber_tex)
+	slider.add_theme_icon_override("grabber_disabled", grabber_tex)
