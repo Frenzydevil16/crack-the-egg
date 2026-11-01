@@ -5,6 +5,7 @@ extends Control
 
 const MAX_CLICKS: int = 10000
 const SAVE_PATH: String = "user://egg_save.json"
+const LoadingOverlay = preload("res://scripts/loading_overlay.gd")
 
 # --- HUD & World Nodes ---
 @onready var background_rect: TextureRect = $Background
@@ -157,6 +158,9 @@ var egg_select_panel: PanelContainer
 var egg_cards_hbox: BoxContainer
 var collection_filter_bar: HBoxContainer
 var _collection_filter_egg: String = "all"
+
+# Loading Screen Overlay
+var loading_overlay = null
 
 # Pet & Wheel System
 var pet_tokens: int = 1 # 1 free starter spin!
@@ -574,6 +578,9 @@ func _get_yt() -> Node:
 	return get_node_or_null("/root/YTGameWrapper")
 
 func _ready() -> void:
+	# Attach Loading Screen Overlay immediately to cover initialization
+	_setup_loading_screen()
+
 	_rng.randomize()
 	_init_egg_states()
 
@@ -655,8 +662,7 @@ func _ready() -> void:
 		flash_overlay.z_index = 70
 		flash_overlay.z_as_relative = false
 
-	# Start background music if allowed
-	_start_bgm_if_needed()
+	# Note: BGM starts smoothly after loading sequence completes in _start_game_loading_sequence()
 
 	# Connect egg click area
 	if egg_touch_area:
@@ -770,17 +776,116 @@ func _ready() -> void:
 	_update_responsive_layout()
 	_update_hud()
 
+	# Kick off real asset preloading, SDK handshake, and smooth loading sequence
+	_start_game_loading_sequence()
+
+func _setup_loading_screen() -> void:
+	if not loading_overlay:
+		loading_overlay = LoadingOverlay.new()
+		add_child(loading_overlay)
+
+func _start_game_loading_sequence() -> void:
+	# Define critical assets list to verify & preload into memory
+	var asset_list: Array[String] = [
+		"res://assets/backgrounds/bg_forest.png",
+		"res://assets/backgrounds/bg_forest_thumb.png",
+		"res://assets/backgrounds/bg_ocean.png",
+		"res://assets/backgrounds/bg_ocean_thumb.png",
+		"res://assets/backgrounds/bg_magma.png",
+		"res://assets/backgrounds/bg_magma_thumb.png",
+		"res://assets/backgrounds/bg_celestial.png",
+		"res://assets/backgrounds/bg_celestial_thumb.png",
+		"res://assets/bg_nature.png",
+		"res://assets/bg_crystal.png",
+		"res://assets/bg_cosmic.png",
+		"res://assets/wheel/wheel_disc.png",
+		"res://assets/wheel/wheel_frame_ui.png",
+		"res://assets/pets/pet_meadow_stage.png",
+		"res://assets/audio/bgm_cozy_loop.wav",
+		"res://assets/audio/click_crisp.wav",
+		"res://assets/audio/click_magic.wav",
+		"res://assets/audio/click_bubble.wav",
+		"res://assets/audio/click_crystal.wav",
+		"res://assets/audio/click_pop.wav",
+		"res://assets/audio/click_laser.wav",
+		"res://assets/audio/click_super_star.wav",
+		"res://assets/audio/buy.wav",
+		"res://assets/audio/crack.wav",
+		"res://assets/audio/shatter.wav",
+		"res://assets/audio/tap.wav",
+		"res://assets/fonts/Fredoka.ttf",
+		"res://assets/slimes/secret_slime.png",
+		"res://assets/egg_nature.svg",
+		"res://assets/egg_crystal.svg",
+		"res://assets/egg_cosmic.svg"
+	]
+
+	# Add all slimes from catalog
+	for s in SLIME_CATALOG:
+		var p_icon: String = s.get("icon_path", "")
+		if p_icon != "" and not asset_list.has(p_icon):
+			asset_list.append(p_icon)
+
+	# Add all pets from catalog
+	for p in PetData.PET_CATALOG:
+		var p_icon: String = p.get("icon_path", "")
+		if p_icon != "" and not asset_list.has(p_icon):
+			asset_list.append(p_icon)
+
+	var total_assets: int = asset_list.size()
+	var loaded_count: int = 0
+
+	# Preload resources in batches across frames to ensure smooth 60fps rendering
+	var batch_size: int = 2
+	for i in range(0, total_assets, batch_size):
+		for j in range(batch_size):
+			var idx: int = i + j
+			if idx < total_assets:
+				var path: String = asset_list[idx]
+				if ResourceLoader.exists(path):
+					var _res = ResourceLoader.load(path)
+				loaded_count += 1
+		var progress: float = (float(loaded_count) / float(total_assets)) * 0.85
+		if loading_overlay:
+			loading_overlay.set_progress(progress)
+		await get_tree().process_frame
+
+	# Phase 2: Apply user data, world visuals and cosmetics
+	_apply_world_visuals(active_egg_id, false)
+	_apply_all_cosmetics()
+	_update_hud()
+	if loading_overlay:
+		loading_overlay.set_progress(0.95)
+	await get_tree().process_frame
+
+	# Phase 3: YouTube Playables SDK handshake
+	var yt = _get_yt()
+	if yt:
+		yt.first_frame_ready()
+		yt.load_data()
+		yt.game_ready()
+
+	if loading_overlay:
+		loading_overlay.set_progress(1.0)
+
+	# Wait until the visual progress bar smoothly reaches 100%
+	while loading_overlay and not loading_overlay.is_ready_to_dismiss():
+		await get_tree().process_frame
+
+	# Transition to game: restore hatched view or open main menu
 	if is_hatched and current_clicks >= target_clicks:
 		_restore_hatched_view()
 	else:
 		_open_main_menu()
 
-	# YouTube Playables SDK lifecycle order: firstFrameReady -> loadData -> gameReady
-	yt = _get_yt()
-	if yt:
-		yt.first_frame_ready()
-		yt.load_data()
-		yt.game_ready()
+	# Start background music if allowed
+	_start_bgm_if_needed()
+
+	# Smoothly fade out loading overlay
+	if loading_overlay:
+		loading_overlay.fade_out_and_dismiss(func():
+			loading_overlay = null
+		)
 
 func _init_egg_states() -> void:
 	for s in SLIME_CATALOG:
