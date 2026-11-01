@@ -1,5 +1,7 @@
 # Crack the egg – 10.000 Klicks (YouTube Playable – Epic Drop & Shop Edition)
 
+> 🎮 **Direkt im Browser spielen:** [https://frenzydevil16.github.io/crack-the-egg/](https://frenzydevil16.github.io/crack-the-egg/)
+
 ## 1. Spiel in einem Satz, Godot-Version, Exportziel
 **Crack the egg – 10.000 Clicks** ist ein cartoonhaftes Clicker- und Sammelspiel, bei dem Spieler ein zentrales Ei durch genau 10.000 effektive Klicks und 14 progressive Riss-Stufen aufbrechen, um in einem epischen Drop-Menü Slimes aus sechs Seltenheitsstufen (Common bis Mythic) zu sammeln und im Shop Klick-Upgrades, zeitbasierte Booster, Glücks-Upgrades und Kosmetik freizuschalten.
 * **Godot-Version:** Godot 4.7.2 (`4.7.2.stable.official.ed1daf0bf`)
