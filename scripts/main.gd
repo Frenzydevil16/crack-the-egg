@@ -570,6 +570,9 @@ const SHOP_CATALOG: Dictionary = {
 	]
 }
 
+func _get_yt() -> Node:
+	return get_node_or_null("/root/YTGameWrapper")
+
 func _ready() -> void:
 	_rng.randomize()
 	_init_egg_states()
@@ -630,7 +633,7 @@ func _ready() -> void:
 	if milestone_banner:
 		milestone_banner.modulate.a = 0.0
 
-	# Ensure all modal overlays and scrims are on an elevated layer (z_index 40+)
+	# Ensure all modal overlays and scrims are on an elevated layer (z_index 50+)
 	# so that pet_companion (z_index 0) is strictly underneath and never rendered on top of menus!
 	var overlays: Array[CanvasItem] = [
 		drop_dim_scrim,
@@ -646,10 +649,10 @@ func _ready() -> void:
 	]
 	for ov in overlays:
 		if ov:
-			ov.z_index = 40
+			ov.z_index = 50
 			ov.z_as_relative = false
 	if flash_overlay:
-		flash_overlay.z_index = 60
+		flash_overlay.z_index = 70
 		flash_overlay.z_as_relative = false
 
 	# Start background music if allowed
@@ -740,18 +743,20 @@ func _ready() -> void:
 	_populate_settings_modal()
 
 	# Connect YouTube Playables SDK events
-	YTGameWrapper.game_paused.connect(_on_yt_game_paused)
-	YTGameWrapper.game_resumed.connect(_on_yt_game_resumed)
-	YTGameWrapper.audio_enabled_changed.connect(_on_yt_audio_changed)
-	YTGameWrapper.load_data_received.connect(_on_yt_load_data_received)
-	YTGameWrapper.save_data_success.connect(_on_yt_save_success)
-	YTGameWrapper.save_data_failed.connect(_on_yt_save_failed)
+	var yt = _get_yt()
+	if yt:
+		yt.game_paused.connect(_on_yt_game_paused)
+		yt.game_resumed.connect(_on_yt_game_resumed)
+		yt.audio_enabled_changed.connect(_on_yt_audio_changed)
+		yt.load_data_received.connect(_on_yt_load_data_received)
+		yt.save_data_success.connect(_on_yt_save_success)
+		yt.save_data_failed.connect(_on_yt_save_failed)
+		_yt_audio_allowed = yt.is_audio_enabled()
 
 	# Responsive layout hook
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 
 	# Apply audio mute state from YouTube & user settings
-	_yt_audio_allowed = YTGameWrapper.is_audio_enabled()
 	_apply_audio_state(_yt_audio_allowed)
 	_apply_user_settings()
 
@@ -771,12 +776,11 @@ func _ready() -> void:
 		_open_main_menu()
 
 	# YouTube Playables SDK lifecycle order: firstFrameReady -> loadData -> gameReady
-	YTGameWrapper.first_frame_ready()
-	YTGameWrapper.load_data()
-
-	if get_tree():
-		await get_tree().process_frame
-	YTGameWrapper.game_ready()
+	yt = _get_yt()
+	if yt:
+		yt.first_frame_ready()
+		yt.load_data()
+		yt.game_ready()
 
 func _init_egg_states() -> void:
 	for s in SLIME_CATALOG:
@@ -1188,7 +1192,7 @@ func _populate_settings_modal() -> void:
 
 	# 1. Spiel-Zoom Slider Row (70% .. 150%, Stepless, Reset Button)
 	var zoom_card := PanelContainer.new()
-	UIKit.style_panel(zoom_card, "card", 18.0, 12.0)
+	UIKit.style_panel(zoom_card, "card", 22.0, 16.0)
 	var zoom_vbox := VBoxContainer.new()
 	zoom_vbox.add_theme_constant_override("separation", 10)
 	zoom_card.add_child(zoom_vbox)
@@ -1200,20 +1204,20 @@ func _populate_settings_modal() -> void:
 	var zoom_title_lbl := Label.new()
 	zoom_title_lbl.text = "🔍 Spiel-Zoom"
 	zoom_title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	UIKit.style_label(zoom_title_lbl, 19, Color.WHITE, 5)
+	UIKit.style_label(zoom_title_lbl, 20, Color.WHITE, 5)
 	zoom_header.add_child(zoom_title_lbl)
 
 	var zoom_pct_lbl := Label.new()
 	zoom_pct_lbl.name = "ZoomPctLabel"
 	zoom_pct_lbl.text = "%d %%" % int(round(setting_game_zoom * 100.0))
-	UIKit.style_label(zoom_pct_lbl, 19, Color("#ffe047"), 5)
+	UIKit.style_label(zoom_pct_lbl, 20, Color("#ffe047"), 5)
 	zoom_header.add_child(zoom_pct_lbl)
 
 	var zoom_reset_btn := Button.new()
 	zoom_reset_btn.name = "ZoomResetBtn"
-	zoom_reset_btn.custom_minimum_size = Vector2(110, 38)
+	zoom_reset_btn.custom_minimum_size = Vector2(130, 44)
 	zoom_reset_btn.text = "Zurücksetzen"
-	UIKit.style_button(zoom_reset_btn, "gray", 14, 14, 10.0, 4.0)
+	UIKit.style_button(zoom_reset_btn, "gray", 15, 16, 12.0, 5.0)
 	zoom_header.add_child(zoom_reset_btn)
 
 	var zoom_slider_hbox := HBoxContainer.new()
@@ -1261,7 +1265,7 @@ func _populate_settings_modal() -> void:
 
 	# 2. Music Volume Row
 	var music_card := PanelContainer.new()
-	UIKit.style_panel(music_card, "card", 18.0, 12.0)
+	UIKit.style_panel(music_card, "card", 22.0, 16.0)
 	var music_vbox := VBoxContainer.new()
 	music_vbox.add_theme_constant_override("separation", 8)
 	music_card.add_child(music_vbox)
@@ -1273,12 +1277,12 @@ func _populate_settings_modal() -> void:
 	var music_title_lbl := Label.new()
 	music_title_lbl.text = "🎼 Musik-Lautstärke"
 	music_title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	UIKit.style_label(music_title_lbl, 19, Color.WHITE, 5)
+	UIKit.style_label(music_title_lbl, 20, Color.WHITE, 5)
 	music_header.add_child(music_title_lbl)
 
 	var music_pct_lbl := Label.new()
 	music_pct_lbl.text = "%d %%" % int(round(setting_music_volume * 100.0))
-	UIKit.style_label(music_pct_lbl, 19, Color("#ffe047"), 5)
+	UIKit.style_label(music_pct_lbl, 20, Color("#ffe047"), 5)
 	music_header.add_child(music_pct_lbl)
 
 	var music_slider_hbox := HBoxContainer.new()
@@ -1287,7 +1291,7 @@ func _populate_settings_modal() -> void:
 
 	var music_min_lbl := Label.new()
 	music_min_lbl.text = "0%"
-	UIKit.style_label(music_min_lbl, 14, Color(0.75, 0.84, 0.95), 3)
+	UIKit.style_label(music_min_lbl, 15, Color(0.75, 0.84, 0.95), 3)
 	music_slider_hbox.add_child(music_min_lbl)
 
 	var music_slider := HSlider.new()
@@ -1302,7 +1306,7 @@ func _populate_settings_modal() -> void:
 
 	var music_max_lbl := Label.new()
 	music_max_lbl.text = "100%"
-	UIKit.style_label(music_max_lbl, 14, Color(0.75, 0.84, 0.95), 3)
+	UIKit.style_label(music_max_lbl, 15, Color(0.75, 0.84, 0.95), 3)
 	music_slider_hbox.add_child(music_max_lbl)
 
 	music_slider.value_changed.connect(func(new_val: float):
@@ -1315,7 +1319,7 @@ func _populate_settings_modal() -> void:
 
 	# 3. SFX Volume Row
 	var sfx_card := PanelContainer.new()
-	UIKit.style_panel(sfx_card, "card", 18.0, 12.0)
+	UIKit.style_panel(sfx_card, "card", 22.0, 16.0)
 	var sfx_vbox := VBoxContainer.new()
 	sfx_vbox.add_theme_constant_override("separation", 8)
 	sfx_card.add_child(sfx_vbox)
@@ -1327,12 +1331,12 @@ func _populate_settings_modal() -> void:
 	var sfx_title_lbl := Label.new()
 	sfx_title_lbl.text = "🔊 Soundeffekte & Klicks"
 	sfx_title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	UIKit.style_label(sfx_title_lbl, 19, Color.WHITE, 5)
+	UIKit.style_label(sfx_title_lbl, 20, Color.WHITE, 5)
 	sfx_header.add_child(sfx_title_lbl)
 
 	var sfx_pct_lbl := Label.new()
 	sfx_pct_lbl.text = "%d %%" % int(round(setting_sfx_volume * 100.0))
-	UIKit.style_label(sfx_pct_lbl, 19, Color("#ffe047"), 5)
+	UIKit.style_label(sfx_pct_lbl, 20, Color("#ffe047"), 5)
 	sfx_header.add_child(sfx_pct_lbl)
 
 	var sfx_slider_hbox := HBoxContainer.new()
@@ -1341,7 +1345,7 @@ func _populate_settings_modal() -> void:
 
 	var sfx_min_lbl := Label.new()
 	sfx_min_lbl.text = "0%"
-	UIKit.style_label(sfx_min_lbl, 14, Color(0.75, 0.84, 0.95), 3)
+	UIKit.style_label(sfx_min_lbl, 15, Color(0.75, 0.84, 0.95), 3)
 	sfx_slider_hbox.add_child(sfx_min_lbl)
 
 	var sfx_slider := HSlider.new()
@@ -1356,7 +1360,7 @@ func _populate_settings_modal() -> void:
 
 	var sfx_max_lbl := Label.new()
 	sfx_max_lbl.text = "100%"
-	UIKit.style_label(sfx_max_lbl, 14, Color(0.75, 0.84, 0.95), 3)
+	UIKit.style_label(sfx_max_lbl, 15, Color(0.75, 0.84, 0.95), 3)
 	sfx_slider_hbox.add_child(sfx_max_lbl)
 
 	sfx_slider.value_changed.connect(func(new_val: float):
@@ -1369,42 +1373,42 @@ func _populate_settings_modal() -> void:
 
 	# 4. Mute Button Row
 	var mute_card := PanelContainer.new()
-	UIKit.style_panel(mute_card, "card", 18.0, 12.0)
+	UIKit.style_panel(mute_card, "card", 22.0, 16.0)
 	var mute_hbox := HBoxContainer.new()
-	mute_hbox.add_theme_constant_override("separation", 12)
+	mute_hbox.add_theme_constant_override("separation", 14)
 	mute_card.add_child(mute_hbox)
 	var mute_lbl := Label.new()
 	mute_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mute_lbl.text = "🔇 Stummschaltung"
-	UIKit.style_label(mute_lbl, 19, Color.WHITE, 5)
+	UIKit.style_label(mute_lbl, 20, Color.WHITE, 5)
 	mute_hbox.add_child(mute_lbl)
 	var mute_btn := Button.new()
-	mute_btn.custom_minimum_size = Vector2(170, 46)
+	mute_btn.custom_minimum_size = Vector2(185, 52)
 	mute_btn.text = "Stumm ✓" if setting_audio_muted else "Ton An"
-	UIKit.style_button(mute_btn, "orange" if setting_audio_muted else "blue", 17, 18, 14.0, 6.0)
+	UIKit.style_button(mute_btn, "orange" if setting_audio_muted else "blue", 18, 18, 14.0, 6.0)
 	mute_btn.pressed.connect(func():
 		setting_audio_muted = not setting_audio_muted
 		mute_btn.text = "Stumm ✓" if setting_audio_muted else "Ton An"
-		UIKit.style_button(mute_btn, "orange" if setting_audio_muted else "blue", 17, 18, 14.0, 6.0)
+		UIKit.style_button(mute_btn, "orange" if setting_audio_muted else "blue", 18, 18, 14.0, 6.0)
 		_apply_audio_state(_yt_audio_allowed)
 		_save_progress()
 	)
 	mute_hbox.add_child(mute_btn)
 	settings_options_vbox.add_child(mute_card)
 
-	# 3. Particles & Background Effects Row
+	# 5. Particles & Background Effects Row
 	var part_card := PanelContainer.new()
-	UIKit.style_panel(part_card, "card", 18.0, 12.0)
+	UIKit.style_panel(part_card, "card", 22.0, 16.0)
 	var part_hbox := HBoxContainer.new()
-	part_hbox.add_theme_constant_override("separation", 12)
+	part_hbox.add_theme_constant_override("separation", 14)
 	part_card.add_child(part_hbox)
 	var part_lbl := Label.new()
 	part_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	part_lbl.text = "✨ Partikel & Welt-Effekte"
-	UIKit.style_label(part_lbl, 19, Color.WHITE, 5)
+	UIKit.style_label(part_lbl, 20, Color.WHITE, 5)
 	part_hbox.add_child(part_lbl)
 	var part_btn := Button.new()
-	part_btn.custom_minimum_size = Vector2(150, 46)
+	part_btn.custom_minimum_size = Vector2(175, 52)
 	part_btn.text = "Aktiviert ✓" if setting_particles_enabled else "Aus"
 	UIKit.style_button(part_btn, "green" if setting_particles_enabled else "gray", 18, 18, 14.0, 6.0)
 	part_btn.pressed.connect(func():
@@ -1416,19 +1420,19 @@ func _populate_settings_modal() -> void:
 	part_hbox.add_child(part_btn)
 	settings_options_vbox.add_child(part_card)
 
-	# 3. Shake Intensity Row
+	# 6. Shake Intensity Row
 	var shake_card := PanelContainer.new()
-	UIKit.style_panel(shake_card, "card", 18.0, 12.0)
+	UIKit.style_panel(shake_card, "card", 22.0, 16.0)
 	var shake_hbox := HBoxContainer.new()
-	shake_hbox.add_theme_constant_override("separation", 12)
+	shake_hbox.add_theme_constant_override("separation", 14)
 	shake_card.add_child(shake_hbox)
 	var shake_lbl := Label.new()
 	shake_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	shake_lbl.text = "🥚 Schüttel-Animationen"
-	UIKit.style_label(shake_lbl, 19, Color.WHITE, 5)
+	UIKit.style_label(shake_lbl, 20, Color.WHITE, 5)
 	shake_hbox.add_child(shake_lbl)
 	var shake_btn := Button.new()
-	shake_btn.custom_minimum_size = Vector2(150, 46)
+	shake_btn.custom_minimum_size = Vector2(175, 52)
 	shake_btn.text = "Sanft" if setting_reduced_shake else "Dynamisch"
 	UIKit.style_button(shake_btn, "blue" if setting_reduced_shake else "orange", 18, 18, 14.0, 6.0)
 	shake_btn.pressed.connect(func():
@@ -1619,27 +1623,47 @@ func _update_responsive_layout() -> void:
 	if progress_label:
 		progress_label.add_theme_font_size_override("font_size", int(round((21 if is_compact else 26) * zoom)))
 
-	# Adapt modal card sizes on compact screens (modals sized relative to window)
-	var modal_w: float = clampf(vp_size.x - 32.0, 320.0, 580.0)
-	var modal_h: float = clampf(vp_size.y - 48.0, 420.0, 640.0)
+	# Large Overhaul: Enlarged modal windows and responsive overlays
+	# Only button-opened overlays are enlarged. Central gameplay, egg scale, and HUD stay authentic!
+	var large_modal_w: float = clampf(vp_size.x - 56.0, 340.0, 960.0)
+	var large_modal_h: float = clampf(vp_size.y - 90.0, 520.0, 1620.0)
+	var medium_modal_w: float = clampf(vp_size.x - 64.0, 330.0, 880.0)
+	var medium_modal_h: float = clampf(vp_size.y - 120.0, 480.0, 1420.0)
+	var compact_modal_w: float = clampf(vp_size.x - 80.0, 320.0, 820.0)
+	var compact_modal_h: float = clampf(vp_size.y - 140.0, 440.0, 1120.0)
+
 	if shop_panel:
-		shop_panel.custom_minimum_size = Vector2(modal_w, modal_h)
+		shop_panel.custom_minimum_size = Vector2(large_modal_w, large_modal_h)
 	if collection_panel:
-		collection_panel.custom_minimum_size = Vector2(modal_w, modal_h)
+		collection_panel.custom_minimum_size = Vector2(large_modal_w, large_modal_h)
 	if settings_panel:
-		settings_panel.custom_minimum_size = Vector2(minf(modal_w, 520.0), minf(modal_h, 560.0))
+		settings_panel.custom_minimum_size = Vector2(medium_modal_w, medium_modal_h)
 	if menu_card:
-		menu_card.custom_minimum_size = Vector2(minf(modal_w, 560.0), minf(modal_h, 640.0))
+		menu_card.custom_minimum_size = Vector2(medium_modal_w, medium_modal_h)
 	if drop_card:
-		drop_card.custom_minimum_size = Vector2(minf(modal_w, 490.0), minf(modal_h, 560.0))
+		drop_card.custom_minimum_size = Vector2(compact_modal_w, compact_modal_h)
+
 	if pet_modal_panel:
-		var pet_w: float = clampf(vp_size.x - 20.0, 340.0, 740.0)
-		var pet_h: float = clampf(vp_size.y - 24.0, 440.0, 720.0)
-		pet_modal_panel.offset_left = -pet_w * 0.5
-		pet_modal_panel.offset_right = pet_w * 0.5
-		pet_modal_panel.offset_top = -pet_h * 0.5
-		pet_modal_panel.offset_bottom = pet_h * 0.5
+		pet_modal_panel.offset_left = -large_modal_w * 0.5
+		pet_modal_panel.offset_right = large_modal_w * 0.5
+		pet_modal_panel.offset_top = -large_modal_h * 0.5
+		pet_modal_panel.offset_bottom = large_modal_h * 0.5
 		call_deferred("_layout_wheel_stage")
+
+	if egg_select_panel:
+		egg_select_panel.offset_left = -large_modal_w * 0.5
+		egg_select_panel.offset_right = large_modal_w * 0.5
+		egg_select_panel.offset_top = -large_modal_h * 0.5
+		egg_select_panel.offset_bottom = large_modal_h * 0.5
+
+	if sound_modal_panel:
+		sound_modal_panel.offset_left = -medium_modal_w * 0.5
+		sound_modal_panel.offset_right = medium_modal_w * 0.5
+		sound_modal_panel.offset_top = -medium_modal_h * 0.5
+		sound_modal_panel.offset_bottom = medium_modal_h * 0.5
+
+	if wheel_reveal_card:
+		wheel_reveal_card.custom_minimum_size = Vector2(minf(compact_modal_w, 540.0), minf(compact_modal_h, 720.0))
 
 # --- Click Processing & Multiplier Calculation ---
 
@@ -2254,11 +2278,11 @@ func _setup_shop_tabs() -> void:
 		child.queue_free()
 	for t in tabs:
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(118, 48)
+		btn.custom_minimum_size = Vector2(142, 54)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.text = t["label"]
 		var tab_id: String = t["id"]
-		UIKit.style_button(btn, t["pal"], 17, 18, 10.0, 6.0)
+		UIKit.style_button(btn, t["pal"], 18, 18, 12.0, 6.0)
 		btn.pressed.connect(func(): _switch_shop_tab(tab_id))
 		shop_tab_bar.add_child(btn)
 
@@ -2327,26 +2351,26 @@ func _update_shop_odds_preview() -> void:
 
 func _create_shop_item_card(tab_id: String, item: Dictionary) -> PanelContainer:
 	var card = PanelContainer.new()
-	UIKit.style_panel(card, "card", 18.0, 14.0)
+	UIKit.style_panel(card, "card", 24.0, 18.0)
 
 	var hbox = HBoxContainer.new()
-	hbox.add_theme_constant_override("separation", 14)
+	hbox.add_theme_constant_override("separation", 16)
 	card.add_child(hbox)
 
 	var info_vbox = VBoxContainer.new()
 	info_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	info_vbox.add_theme_constant_override("separation", 4)
+	info_vbox.add_theme_constant_override("separation", 6)
 	hbox.add_child(info_vbox)
 
 	var title_lbl = Label.new()
 	title_lbl.text = item["title"]
-	UIKit.style_label(title_lbl, 20, Color(1.0, 0.92, 0.42), 5, Color(0.08, 0.05, 0.02))
+	UIKit.style_label(title_lbl, 22, Color(1.0, 0.92, 0.42), 5, Color(0.08, 0.05, 0.02))
 	info_vbox.add_child(title_lbl)
 
 	var desc_lbl = Label.new()
 	desc_lbl.text = item["desc"]
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	UIKit.style_label(desc_lbl, 15, Color(0.88, 0.93, 1.0), 3, Color(0.04, 0.07, 0.16), false)
+	UIKit.style_label(desc_lbl, 16, Color(0.88, 0.93, 1.0), 3, Color(0.04, 0.07, 0.16), false)
 	info_vbox.add_child(desc_lbl)
 
 	# If Luck tab, show full 100% probability table for this tier right on the card
@@ -2358,29 +2382,29 @@ func _create_shop_item_card(tab_id: String, item: Dictionary) -> PanelContainer:
 			_format_pct(ch["epic"]), _format_pct(ch["legendary"]), _format_pct(ch["mythic"])
 		]
 		odds_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		UIKit.style_label(odds_lbl, 13, Color(0.62, 0.92, 1.0), 3)
+		UIKit.style_label(odds_lbl, 14, Color(0.62, 0.92, 1.0), 3)
 		info_vbox.add_child(odds_lbl)
 
 	# If Backgrounds tab, show visual landscape preview thumbnail
 	if tab_id == "backgrounds" and item.has("thumb") and ResourceLoader.exists(item["thumb"]):
 		var thumb_rect = TextureRect.new()
-		thumb_rect.custom_minimum_size = Vector2(148, 86)
-		thumb_rect.size = Vector2(148, 86)
+		thumb_rect.custom_minimum_size = Vector2(210, 120)
+		thumb_rect.size = Vector2(210, 120)
 		thumb_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		thumb_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		thumb_rect.texture = load(item["thumb"])
 
 		var thumb_frame = PanelContainer.new()
-		thumb_frame.custom_minimum_size = Vector2(152, 90)
+		thumb_frame.custom_minimum_size = Vector2(216, 126)
 		thumb_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		thumb_frame.add_child(thumb_rect)
 		var is_bg_active = (equipped_custom_bg == item.get("id", ""))
-		UIKit.style_panel(thumb_frame, "card_active" if is_bg_active else "inset", 12.0, 2.0)
+		UIKit.style_panel(thumb_frame, "card_active" if is_bg_active else "inset", 14.0, 2.0)
 		hbox.add_child(thumb_frame)
 		hbox.move_child(thumb_frame, 0)
 
 	var action_btn = Button.new()
-	action_btn.custom_minimum_size = Vector2(158, 52)
+	action_btn.custom_minimum_size = Vector2(185, 58)
 	action_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	hbox.add_child(action_btn)
 
@@ -2460,10 +2484,10 @@ func _create_shop_item_card(tab_id: String, item: Dictionary) -> PanelContainer:
 			var is_active = (equipped_click_sound == item_id)
 
 			var preview_btn = Button.new()
-			preview_btn.custom_minimum_size = Vector2(144, 52)
+			preview_btn.custom_minimum_size = Vector2(175, 58)
 			preview_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			preview_btn.text = "🔊 Probehören"
-			UIKit.style_button(preview_btn, "navy", 16, 16, 12.0, 5.0)
+			UIKit.style_button(preview_btn, "navy", 17, 18, 14.0, 6.0)
 			preview_btn.pressed.connect(func():
 				_preview_click_sound(item_id)
 			)
@@ -2473,11 +2497,11 @@ func _create_shop_item_card(tab_id: String, item: Dictionary) -> PanelContainer:
 			if is_active:
 				action_btn.text = "AKTIV ✓"
 				action_btn.disabled = true
-				UIKit.style_button(action_btn, "green", 17, 18, 12.0, 6.0)
-				UIKit.style_panel(card, "card_active", 18.0, 14.0)
+				UIKit.style_button(action_btn, "green", 18, 18, 14.0, 6.0)
+				UIKit.style_panel(card, "card_active", 24.0, 18.0)
 			elif owned:
 				action_btn.text = "Auswählen"
-				UIKit.style_button(action_btn, "blue", 17, 18, 12.0, 6.0)
+				UIKit.style_button(action_btn, "blue", 18, 18, 14.0, 6.0)
 				action_btn.pressed.connect(func():
 					equipped_click_sound = item_id
 					_play_tap_audio()
@@ -2485,7 +2509,7 @@ func _create_shop_item_card(tab_id: String, item: Dictionary) -> PanelContainer:
 				)
 			else:
 				action_btn.text = "%s Münzen" % _format_number(price)
-				UIKit.style_button(action_btn, "orange", 17, 18, 12.0, 6.0)
+				UIKit.style_button(action_btn, "orange", 18, 18, 14.0, 6.0)
 				action_btn.pressed.connect(func(): _try_buy_click_sound(item))
 		"cosmetics":
 			var owned = item_id in owned_cosmetics
@@ -2493,8 +2517,8 @@ func _create_shop_item_card(tab_id: String, item: Dictionary) -> PanelContainer:
 			if is_equipped:
 				action_btn.text = "AUSGERÜSTET ✓"
 				action_btn.disabled = true
-				UIKit.style_button(action_btn, "green", 17, 18, 12.0, 6.0)
-				UIKit.style_panel(card, "card_active", 18.0, 14.0)
+				UIKit.style_button(action_btn, "green", 18, 18, 14.0, 6.0)
+				UIKit.style_panel(card, "card_active", 24.0, 18.0)
 			elif owned:
 				action_btn.text = "Ausrüsten"
 				UIKit.style_button(action_btn, "blue", 18, 18, 14.0, 6.0)
@@ -3231,16 +3255,16 @@ func _populate_pet_inventory() -> void:
 		var is_active = (equipped_pet_id == pid)
 
 		var card = PanelContainer.new()
-		card.custom_minimum_size = Vector2(280, 130)
-		UIKit.style_panel(card, "card_active" if is_active else ("card" if owned else "card_locked"), 14.0, 10.0)
+		card.custom_minimum_size = Vector2(340, 160)
+		UIKit.style_panel(card, "card_active" if is_active else ("card" if owned else "card_locked"), 22.0, 18.0)
 		pet_inventory_grid.add_child(card)
 
 		var hbox = HBoxContainer.new()
-		hbox.add_theme_constant_override("separation", 10)
+		hbox.add_theme_constant_override("separation", 14)
 		card.add_child(hbox)
 
 		var icon = TextureRect.new()
-		icon.custom_minimum_size = Vector2(80, 80)
+		icon.custom_minimum_size = Vector2(100, 100)
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -3252,30 +3276,30 @@ func _populate_pet_inventory() -> void:
 
 		var vbox = VBoxContainer.new()
 		vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		vbox.add_theme_constant_override("separation", 4)
+		vbox.add_theme_constant_override("separation", 6)
 		hbox.add_child(vbox)
 
 		var name_lbl = Label.new()
 		name_lbl.text = pet["name"] if owned else "???"
-		UIKit.style_label(name_lbl, 17, pet["color"] if owned else Color(0.6, 0.65, 0.75), 4)
+		UIKit.style_label(name_lbl, 20, pet["color"] if owned else Color(0.6, 0.65, 0.75), 4)
 		vbox.add_child(name_lbl)
 
 		var desc_lbl = Label.new()
 		desc_lbl.text = pet["bonus_desc"] if owned else "Am Glücksrad freischaltbar"
 		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		UIKit.style_label(desc_lbl, 13, Color(0.85, 0.9, 1.0) if owned else Color(0.5, 0.55, 0.65), 3, Color(0, 0, 0), false)
+		UIKit.style_label(desc_lbl, 15, Color(0.85, 0.9, 1.0) if owned else Color(0.5, 0.55, 0.65), 3, Color(0, 0, 0), false)
 		vbox.add_child(desc_lbl)
 
 		if owned:
 			var equip_btn = Button.new()
-			equip_btn.custom_minimum_size = Vector2(120, 36)
+			equip_btn.custom_minimum_size = Vector2(150, 48)
 			if is_active:
 				equip_btn.text = "AKTIV ✓"
 				equip_btn.disabled = true
-				UIKit.style_button(equip_btn, "green", 13, 13, 8.0, 4.0)
+				UIKit.style_button(equip_btn, "green", 16, 16, 10.0, 5.0)
 			else:
 				equip_btn.text = "Ausrüsten"
-				UIKit.style_button(equip_btn, "blue", 13, 13, 8.0, 4.0)
+				UIKit.style_button(equip_btn, "blue", 16, 16, 10.0, 5.0)
 				var chosen_pid = pid
 				equip_btn.pressed.connect(func():
 					equipped_pet_id = chosen_pid
@@ -3408,16 +3432,16 @@ func _populate_egg_cards() -> void:
 
 		var card = PanelContainer.new()
 		var theme_key = "card_active" if is_active else ("card" if unlocked else "card_locked")
-		UIKit.style_panel(card, theme_key, 20.0, 16.0)
+		UIKit.style_panel(card, theme_key, 26.0, 20.0)
 		egg_cards_hbox.add_child(card)
 
 		var hbox = HBoxContainer.new()
-		hbox.add_theme_constant_override("separation", 16)
+		hbox.add_theme_constant_override("separation", 20)
 		card.add_child(hbox)
 
 		# Left preview column with Egg + Lock icon overlay if locked
 		var preview_wrap = Control.new()
-		preview_wrap.custom_minimum_size = Vector2(120, 148)
+		preview_wrap.custom_minimum_size = Vector2(160, 200)
 		hbox.add_child(preview_wrap)
 
 		var egg_tex = TextureRect.new()
@@ -3432,9 +3456,9 @@ func _populate_egg_cards() -> void:
 
 		if not unlocked and ResourceLoader.exists("res://assets/lock_icon.svg"):
 			var lock_icon = TextureRect.new()
-			lock_icon.custom_minimum_size = Vector2(54, 54)
-			lock_icon.size = Vector2(54, 54)
-			lock_icon.position = Vector2(33, 47)
+			lock_icon.custom_minimum_size = Vector2(58, 58)
+			lock_icon.size = Vector2(58, 58)
+			lock_icon.position = Vector2(51, 71)
 			lock_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			lock_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			lock_icon.texture = load("res://assets/lock_icon.svg")
@@ -3443,25 +3467,25 @@ func _populate_egg_cards() -> void:
 		# Middle info column
 		var info_vbox = VBoxContainer.new()
 		info_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		info_vbox.add_theme_constant_override("separation", 5)
+		info_vbox.add_theme_constant_override("separation", 6)
 		hbox.add_child(info_vbox)
 
 		var name_lbl = Label.new()
 		var status_tag = " [AKTIV]" if is_active else (" [FREIGESCHALTET]" if unlocked else " [GESPERRT]")
 		name_lbl.text = "%s%s" % [w_cfg["name"], status_tag]
-		UIKit.style_label(name_lbl, 21, w_cfg["theme_color"] if unlocked else Color(0.65, 0.72, 0.82), 6)
+		UIKit.style_label(name_lbl, 24, w_cfg["theme_color"] if unlocked else Color(0.65, 0.72, 0.82), 6)
 		info_vbox.add_child(name_lbl)
 
 		var sub_lbl = Label.new()
 		sub_lbl.text = "%s — %s" % [w_cfg["subtitle"], w_cfg["description"]]
 		sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		UIKit.style_label(sub_lbl, 14, Color(0.86, 0.92, 1.0), 3, Color(0.04, 0.07, 0.16), false)
+		UIKit.style_label(sub_lbl, 16, Color(0.86, 0.92, 1.0), 3, Color(0.04, 0.07, 0.16), false)
 		info_vbox.add_child(sub_lbl)
 
 		var rar_lbl = Label.new()
 		rar_lbl.text = "Mögliche Raritäten: Common • Uncommon • Rare • Epic • Legendary • Mythic (6 eigene Slimes)"
 		rar_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		UIKit.style_label(rar_lbl, 13, Color(0.68, 0.92, 1.0), 3, Color(0.04, 0.07, 0.16), false)
+		UIKit.style_label(rar_lbl, 14, Color(0.68, 0.92, 1.0), 3, Color(0.04, 0.07, 0.16), false)
 		info_vbox.add_child(rar_lbl)
 
 		var prog_lbl = Label.new()
@@ -3472,26 +3496,26 @@ func _populate_egg_cards() -> void:
 			prog_lbl.text = "Aktuelles Klickziel: %s / %s (%s %%) | Geöffnet: %dx" % [
 				_format_number(c_val), _format_number(t_val), _format_pct(pct_v), int(st.get("drops_count", 0))
 			]
-			UIKit.style_label(prog_lbl, 14, Color(1.0, 0.92, 0.38), 4)
+			UIKit.style_label(prog_lbl, 16, Color(1.0, 0.92, 0.38), 4)
 		else:
 			prog_lbl.text = "🔒 Freischaltbedingung: %s" % w_cfg["unlock_hint"]
-			UIKit.style_label(prog_lbl, 14, Color(1.0, 0.62, 0.42), 4)
+			UIKit.style_label(prog_lbl, 16, Color(1.0, 0.62, 0.42), 4)
 		prog_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		info_vbox.add_child(prog_lbl)
 
 		# Right button column
 		var sel_btn = Button.new()
-		sel_btn.custom_minimum_size = Vector2(148, 54)
+		sel_btn.custom_minimum_size = Vector2(190, 64)
 		sel_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		hbox.add_child(sel_btn)
 
 		if is_active:
 			sel_btn.text = "AUSGEWÄHLT ✓"
 			sel_btn.disabled = true
-			UIKit.style_button(sel_btn, "green", 16, 16, 12.0, 6.0)
+			UIKit.style_button(sel_btn, "green", 18, 18, 14.0, 6.0)
 		elif unlocked:
 			sel_btn.text = "Auswählen"
-			UIKit.style_button(sel_btn, "blue", 18, 16, 12.0, 6.0)
+			UIKit.style_button(sel_btn, "blue", 18, 18, 14.0, 6.0)
 			var chosen_id: String = egg_id
 			sel_btn.pressed.connect(func():
 				select_egg(chosen_id)
@@ -3500,7 +3524,7 @@ func _populate_egg_cards() -> void:
 		else:
 			sel_btn.text = "Gesperrt 🔒"
 			sel_btn.disabled = true
-			UIKit.style_button(sel_btn, "slate", 16, 16, 12.0, 6.0)
+			UIKit.style_button(sel_btn, "slate", 18, 18, 14.0, 6.0)
 
 func _build_collection_filter_bar() -> void:
 	if not collection_panel or collection_filter_bar:
@@ -3563,6 +3587,7 @@ func _close_collection() -> void:
 func _populate_collection_grid() -> void:
 	if not collection_grid:
 		return
+	collection_grid.columns = 3
 	for child in collection_grid.get_children():
 		child.queue_free()
 
@@ -3591,11 +3616,11 @@ func _populate_collection_grid() -> void:
 
 		var card = PanelContainer.new()
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		UIKit.style_panel(card, "card" if count > 0 else "card_locked", 14.0, 12.0)
+		UIKit.style_panel(card, "card" if count > 0 else "card_locked", 18.0, 16.0)
 
 		var vbox = VBoxContainer.new()
 		vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-		vbox.add_theme_constant_override("separation", 5)
+		vbox.add_theme_constant_override("separation", 6)
 		card.add_child(vbox)
 
 		# Top header with Rarity + NEU badge
@@ -3607,13 +3632,13 @@ func _populate_collection_grid() -> void:
 		var r_tier: String = slime.get("rarity", "common")
 		var pct: float = float(active_chances.get(r_tier, slime.get("base_chance", 0.5)))
 		r_lbl.text = "★ %s (%s%%)" % [slime["rarity_name"], _format_pct(pct)]
-		UIKit.style_label(r_lbl, 14, r_col, 4)
+		UIKit.style_label(r_lbl, 16, r_col, 4)
 		top_hbox.add_child(r_lbl)
 
 		if is_new:
 			var new_lbl = Label.new()
 			new_lbl.text = " [NEU!]"
-			UIKit.style_label(new_lbl, 13, Color(1.0, 0.92, 0.2), 4)
+			UIKit.style_label(new_lbl, 15, Color(1.0, 0.92, 0.2), 4)
 			top_hbox.add_child(new_lbl)
 
 		var egg_origin_lbl = Label.new()
@@ -3621,12 +3646,12 @@ func _populate_collection_grid() -> void:
 		var egg_origin_name = "Alle Eier" if slime["egg_id"] == "all" else str(slime.get("egg_name", "Nature Egg"))
 		egg_origin_lbl.text = egg_badge_prefix + egg_origin_name
 		egg_origin_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		UIKit.style_label(egg_origin_lbl, 12, Color(0.75, 0.88, 1.0), 3, Color(0.04, 0.07, 0.16), false)
+		UIKit.style_label(egg_origin_lbl, 14, Color(0.75, 0.88, 1.0), 3, Color(0.04, 0.07, 0.16), false)
 		vbox.add_child(egg_origin_lbl)
 
 		# Slime Portrait
 		var icon = TextureRect.new()
-		icon.custom_minimum_size = Vector2(112, 114)
+		icon.custom_minimum_size = Vector2(128, 128)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture = load(slime["path"])
@@ -3637,13 +3662,13 @@ func _populate_collection_grid() -> void:
 		var name_lbl = Label.new()
 		name_lbl.text = slime["name"] if count > 0 else "???"
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		UIKit.style_label(name_lbl, 16, Color.WHITE if count > 0 else Color(0.55, 0.62, 0.75), 5)
+		UIKit.style_label(name_lbl, 19, Color.WHITE if count > 0 else Color(0.55, 0.62, 0.75), 5)
 		vbox.add_child(name_lbl)
 
 		var count_lbl = Label.new()
 		count_lbl.text = "Gefunden: %dx" % count
 		count_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		UIKit.style_label(count_lbl, 13, Color(0.82, 0.90, 1.0) if count > 0 else Color(0.45, 0.52, 0.65), 3, Color(0.04, 0.07, 0.16), false)
+		UIKit.style_label(count_lbl, 15, Color(0.82, 0.90, 1.0) if count > 0 else Color(0.45, 0.52, 0.65), 3, Color(0.04, 0.07, 0.16), false)
 		vbox.add_child(count_lbl)
 
 		collection_grid.add_child(card)
@@ -3855,11 +3880,11 @@ func _save_progress() -> void:
 		file.close()
 
 	# YouTube Cloud Save (only after loadData completed, per certification rules)
-	if is_cloud_data_loaded:
-		YTGameWrapper.save_data(save_json)
-
-	# YouTube Score (MUST be integer)
-	YTGameWrapper.send_score(max(current_clicks, total_lifetime_clicks))
+	var yt = _get_yt()
+	if yt:
+		if is_cloud_data_loaded:
+			yt.save_data(save_json)
+		yt.send_score(max(current_clicks, total_lifetime_clicks))
 
 func _load_local_data() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
@@ -4039,7 +4064,9 @@ func _on_yt_game_resumed() -> void:
 	get_tree().paused = false
 	if pause_overlay:
 		pause_overlay.visible = false
-	_yt_audio_allowed = YTGameWrapper.is_audio_enabled()
+	var yt = _get_yt()
+	if yt:
+		_yt_audio_allowed = yt.is_audio_enabled()
 	_apply_audio_state(_yt_audio_allowed)
 	_update_responsive_layout()
 
