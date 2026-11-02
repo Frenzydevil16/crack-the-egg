@@ -17,29 +17,31 @@
 // This object will be exposed on the window to be called from Godot.
 // It interfaces with the YouTube Playables Game SDK.
 window.YTGameSDK_Godot = {
-    // Helper to check if we are in the Playables environment.
+    // Helper to check if we are in the Playables environment or Test Suite.
     _inEnv: function() {
-        return typeof ytgame !== 'undefined' && Boolean(ytgame.IN_PLAYABLES_ENV);
+        return typeof ytgame !== 'undefined';
     },
 
     getSDKVersion: function() {
-        return this._inEnv() ? ytgame.SDK_VERSION : "N/A";
+        return (typeof ytgame !== 'undefined' && ytgame.SDK_VERSION) ? ytgame.SDK_VERSION : "N/A";
     },
 
     sendScore: function(score) {
-        if (this._inEnv()) {
+        if (typeof ytgame !== 'undefined' && ytgame.engagement && typeof ytgame.engagement.sendScore === 'function') {
             ytgame.engagement.sendScore({ value: Math.floor(score) });
         }
     },
 
     firstFrameReady: function() {
-        if (this._inEnv()) {
+        if (typeof ytgame !== 'undefined' && ytgame.game && typeof ytgame.game.firstFrameReady === 'function') {
+            console.log("[YTGameSDK] Invoking ytgame.game.firstFrameReady()");
             ytgame.game.firstFrameReady();
         }
     },
 
     gameReady: function() {
-        if (this._inEnv()) {
+        if (typeof ytgame !== 'undefined' && ytgame.game && typeof ytgame.game.gameReady === 'function') {
+            console.log("[YTGameSDK] Invoking ytgame.game.gameReady()");
             ytgame.game.gameReady();
         }
     },
