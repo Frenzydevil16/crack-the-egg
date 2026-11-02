@@ -220,9 +220,6 @@ const engine = new Engine(GODOT_CONFIG);
 			},
 		}).then(() => {
 			setStatusMode('hidden');
-			if (window.YTGameSDK_Godot && typeof window.YTGameSDK_Godot.gameReady === 'function') {
-				window.YTGameSDK_Godot.gameReady();
-			}
 		}, displayFailureNotice);
 	}
 }());
