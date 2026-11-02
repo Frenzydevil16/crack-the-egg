@@ -579,6 +579,11 @@ func _get_yt() -> Node:
 	return get_node_or_null("/root/YTGameWrapper")
 
 func _ready() -> void:
+	# 1. Immediately signal first frame ready to YouTube Playables
+	var yt_first = _get_yt()
+	if yt_first:
+		yt_first.first_frame_ready()
+
 	# Attach Loading Screen Overlay immediately to cover initialization
 	_setup_loading_screen()
 
@@ -814,10 +819,9 @@ func _start_game_loading_sequence() -> void:
 		loading_overlay.set_progress(0.95)
 	await get_tree().process_frame
 
-	# Phase 3: YouTube Playables SDK handshake (Instant gameReady notification)
+	# Phase 3: YouTube Playables SDK handshake (Game is interactive)
 	var yt = _get_yt()
 	if yt:
-		yt.first_frame_ready()
 		yt.load_data()
 		yt.game_ready()
 

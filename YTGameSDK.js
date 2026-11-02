@@ -17,6 +17,9 @@
 // This object will be exposed on the window to be called from Godot.
 // It interfaces with the YouTube Playables Game SDK.
 window.YTGameSDK_Godot = {
+    _hasFirstFrameReady: false,
+    _hasGameReady: false,
+
     // Helper to check if we are in the Playables environment or Test Suite.
     _inEnv: function() {
         return typeof ytgame !== 'undefined';
@@ -33,6 +36,10 @@ window.YTGameSDK_Godot = {
     },
 
     firstFrameReady: function() {
+        if (this._hasFirstFrameReady) {
+            return;
+        }
+        this._hasFirstFrameReady = true;
         if (typeof ytgame !== 'undefined' && ytgame.game && typeof ytgame.game.firstFrameReady === 'function') {
             console.log("[YTGameSDK] Invoking ytgame.game.firstFrameReady()");
             ytgame.game.firstFrameReady();
@@ -40,6 +47,15 @@ window.YTGameSDK_Godot = {
     },
 
     gameReady: function() {
+        if (this._hasGameReady) {
+            return;
+        }
+        // Strict Playables requirement: firstFrameReady MUST always be called before gameReady
+        if (!this._hasFirstFrameReady) {
+            console.log("[YTGameSDK] Ensuring firstFrameReady() is called before gameReady()");
+            this.firstFrameReady();
+        }
+        this._hasGameReady = true;
         if (typeof ytgame !== 'undefined' && ytgame.game && typeof ytgame.game.gameReady === 'function') {
             console.log("[YTGameSDK] Invoking ytgame.game.gameReady()");
             ytgame.game.gameReady();
