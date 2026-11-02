@@ -786,70 +786,25 @@ func _setup_loading_screen() -> void:
 		add_child(loading_overlay)
 
 func _start_game_loading_sequence() -> void:
-	# Define critical assets list to verify & preload into memory
+	# Essential minimal assets for instant start (Lazy loading for non-essential assets)
 	var asset_list: Array[String] = [
-		"res://assets/backgrounds/bg_forest.png",
-		"res://assets/backgrounds/bg_forest_thumb.png",
-		"res://assets/backgrounds/bg_ocean.png",
-		"res://assets/backgrounds/bg_ocean_thumb.png",
-		"res://assets/backgrounds/bg_magma.png",
-		"res://assets/backgrounds/bg_magma_thumb.png",
-		"res://assets/backgrounds/bg_celestial.png",
-		"res://assets/backgrounds/bg_celestial_thumb.png",
 		"res://assets/bg_nature.png",
-		"res://assets/bg_crystal.png",
-		"res://assets/bg_cosmic.png",
-		"res://assets/wheel/wheel_disc.png",
-		"res://assets/wheel/wheel_frame_ui.png",
-		"res://assets/pets/pet_meadow_stage.png",
+		"res://assets/egg_nature.svg",
 		"res://assets/audio/bgm_cozy_loop.wav",
-		"res://assets/audio/click_crisp.wav",
-		"res://assets/audio/click_magic.wav",
-		"res://assets/audio/click_bubble.wav",
-		"res://assets/audio/click_crystal.wav",
-		"res://assets/audio/click_pop.wav",
-		"res://assets/audio/click_laser.wav",
-		"res://assets/audio/click_super_star.wav",
-		"res://assets/audio/buy.wav",
+		"res://assets/audio/tap.wav",
 		"res://assets/audio/crack.wav",
 		"res://assets/audio/shatter.wav",
-		"res://assets/audio/tap.wav",
-		"res://assets/fonts/Fredoka.ttf",
-		"res://assets/slimes/secret_slime.png",
-		"res://assets/egg_nature.svg",
-		"res://assets/egg_crystal.svg",
-		"res://assets/egg_cosmic.svg"
+		"res://assets/fonts/Fredoka.ttf"
 	]
 
-	# Add all slimes from catalog
-	for s in SLIME_CATALOG:
-		var p_icon: String = s.get("icon_path", "")
-		if p_icon != "" and not asset_list.has(p_icon):
-			asset_list.append(p_icon)
+	# Phase 1: Rapid preload of essential startup assets
+	for path in asset_list:
+		if ResourceLoader.exists(path):
+			var _res = ResourceLoader.load(path)
 
-	# Add all pets from catalog
-	for p in PetData.PET_CATALOG:
-		var p_icon: String = p.get("icon_path", "")
-		if p_icon != "" and not asset_list.has(p_icon):
-			asset_list.append(p_icon)
-
-	var total_assets: int = asset_list.size()
-	var loaded_count: int = 0
-
-	# Preload resources in batches across frames to ensure smooth 60fps rendering
-	var batch_size: int = 2
-	for i in range(0, total_assets, batch_size):
-		for j in range(batch_size):
-			var idx: int = i + j
-			if idx < total_assets:
-				var path: String = asset_list[idx]
-				if ResourceLoader.exists(path):
-					var _res = ResourceLoader.load(path)
-				loaded_count += 1
-		var progress: float = (float(loaded_count) / float(total_assets)) * 0.85
-		if loading_overlay:
-			loading_overlay.set_progress(progress)
-		await get_tree().process_frame
+	if loading_overlay:
+		loading_overlay.set_progress(0.70)
+	await get_tree().process_frame
 
 	# Phase 2: Apply user data, world visuals and cosmetics
 	_apply_world_visuals(active_egg_id, false)
@@ -859,7 +814,7 @@ func _start_game_loading_sequence() -> void:
 		loading_overlay.set_progress(0.95)
 	await get_tree().process_frame
 
-	# Phase 3: YouTube Playables SDK handshake
+	# Phase 3: YouTube Playables SDK handshake (Instant gameReady notification)
 	var yt = _get_yt()
 	if yt:
 		yt.first_frame_ready()
